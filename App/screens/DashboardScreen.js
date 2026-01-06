@@ -18,7 +18,7 @@ import ProgressCircle from "../components/ProgressCircle";
 const { width } = Dimensions.get("window");
 
 export default function Dashboard() {
-  const [activeNav, setActiveNav] = useState("Home");
+  const [activeNav, setActiveNav] = useState("Dashboard");
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [searchText, setSearchText] = useState("");
 
@@ -326,6 +326,9 @@ export default function Dashboard() {
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>My Active Courses</Text>
+            <TouchableOpacity>
+              <Text style={styles.seeMoreLink}>See more</Text>
+            </TouchableOpacity>
           </View>
           <Text style={styles.sectionSubtitle}>
             Here's what you're currently learning
@@ -334,29 +337,44 @@ export default function Dashboard() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.horizontalScroll}>
+            style={styles.horizontalScroll}
+            contentContainerStyle={styles.horizontalScrollContent}>
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
-                <View style={styles.courseHeader}>
-                  <View style={styles.courseIcon}>
-                    <Ionicons name={course.icon} size={24} color="#4A6FFF" />
+                <Image
+                  source={require("../assets/course.png")}
+                  style={styles.courseImage}
+                  resizeMode="cover"
+                />
+                <Text
+                  style={styles.courseTitle}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">
+                  {course.title}
+                </Text>
+                <Text style={styles.courseInstructor}>{course.instructor}</Text>
+
+                {/* Progress Bar */}
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBackground}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        { width: `${course.progress}%` },
+                      ]}
+                    />
                   </View>
-                  <Text style={styles.courseTitle} numberOfLines={2}>
-                    {course.title}
+                  <Text style={styles.progressText}>
+                    {course.progress}% Complete
                   </Text>
                 </View>
-                <Text style={styles.courseInstructor}>{course.instructor}</Text>
-                <ProgressCircle percentage={75} size={11} />
+
                 <TouchableOpacity style={styles.continueCourseBtn}>
                   <Text style={styles.continueCourseText}>Continue</Text>
                 </TouchableOpacity>
               </View>
             ))}
           </ScrollView>
-
-          <TouchableOpacity>
-            <Text style={styles.seeMoreLink}>See more</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Completed Courses */}
@@ -371,30 +389,47 @@ export default function Dashboard() {
             You've finished these. Great job!
           </Text>
 
-          <View style={styles.completedList}>
-            {completedCourses.map((course, index) => (
-              <View key={index} style={styles.completedCard}>
-                <View style={styles.completedCourseInfo}>
-                  <View style={styles.completedIcon}>
-                    <Ionicons
-                      name="checkmark-circle"
-                      size={24}
-                      color="#4CAF50"
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.horizontalScroll}
+            contentContainerStyle={styles.horizontalScrollContent}>
+            {activeCourses.map((course, index) => (
+              <View key={index} style={styles.courseCard}>
+                <Image
+                  source={require("../assets/course.png")}
+                  style={styles.courseImage}
+                  resizeMode="cover"
+                />
+                <Text
+                  style={styles.courseTitle}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">
+                  {course.title}
+                </Text>
+                <Text style={styles.courseInstructor}>{course.instructor}</Text>
+
+                {/* Progress Bar */}
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBackground}>
+                    <View
+                      style={[
+                        styles.progressFill,
+                        { width: `${course.progress}%` },
+                      ]}
                     />
                   </View>
-                  <View>
-                    <Text style={styles.completedTitle}>{course.title}</Text>
-                    <Text style={styles.completedInstructor}>
-                      {course.instructor}
-                    </Text>
-                  </View>
+                  <Text style={styles.progressText}>
+                    {course.progress}% Complete
+                  </Text>
                 </View>
-                <TouchableOpacity style={styles.certificateBtn}>
-                  <Text style={styles.certificateText}>View Certificate</Text>
+
+                <TouchableOpacity style={styles.continueCourseBtn}>
+                  <Text style={styles.continueCourseText}>Continue</Text>
                 </TouchableOpacity>
               </View>
             ))}
-          </View>
+          </ScrollView>
         </View>
 
         {/* Upcoming Tasks */}
@@ -409,31 +444,38 @@ export default function Dashboard() {
             Stay on track with your learning schedule
           </Text>
 
-          <View style={styles.tasksList}>
+          <View style={styles.completedList}>
             {upcomingTasks.map((task, index) => (
-              <View key={index} style={styles.taskCard}>
-                <View style={styles.taskInfo}>
-                  <Text style={styles.taskTitle}>{task.title}</Text>
-                  <Text style={styles.taskCourse}>{task.course}</Text>
-                  <Text style={styles.taskDue}>{task.due}</Text>
+              <View key={index} style={styles.completedCard}>
+                <View style={styles.completedCourseInfo}>
+                  <View>
+                    <Text style={styles.completedTitle}>{task.title}</Text>
+                    <Text style={styles.taskCourse}>{task.course}</Text>
+                    <Text style={styles.taskDue}>{task.due}</Text>
+
+                    <Text style={styles.completedInstructor}>
+                      {task.instructor}
+                    </Text>
+                  </View>
                 </View>
+
                 {index === 0 && (
-                  <TouchableOpacity style={styles.quizBtn}>
+                  <TouchableOpacity style={styles.certificateBtn}>
                     <Text style={styles.quizText}>Take Quiz Now</Text>
                   </TouchableOpacity>
                 )}
                 {index === 1 && (
-                  <TouchableOpacity style={styles.uploadBtn}>
+                  <TouchableOpacity style={styles.certificateBtn}>
                     <Text style={styles.uploadText}>Upload Project</Text>
                   </TouchableOpacity>
                 )}
                 {index === 2 && (
-                  <TouchableOpacity style={styles.watchBtn}>
+                  <TouchableOpacity style={styles.certificateBtn}>
                     <Text style={styles.watchText}>Watch Now</Text>
                   </TouchableOpacity>
                 )}
                 {index === 3 && (
-                  <TouchableOpacity style={styles.resumeBtn}>
+                  <TouchableOpacity style={styles.certificateBtn}>
                     <Text style={styles.resumeText}>Resume Lesson</Text>
                   </TouchableOpacity>
                 )}
@@ -457,33 +499,42 @@ export default function Dashboard() {
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.horizontalScroll}>
-            {recommendedCourses.map((course, index) => (
-              <View key={index} style={styles.recommendedCard}>
-                <View style={styles.ratingBadge}>
-                  <Ionicons name="star" size={12} color="#FFD700" />
-                  <Text style={styles.ratingText}>{course.rating}</Text>
-                </View>
-                <View style={styles.courseInfo}>
-                  <Text style={styles.recommendedInstructor}>
-                    {course.instructor}
-                  </Text>
-                  <Text style={styles.recommendedTitle} numberOfLines={2}>
-                    {course.title}
-                  </Text>
-                  <View style={styles.courseDetails}>
-                    <Text style={styles.courseDuration}>{course.duration}</Text>
-                    <Text
-                      style={[
-                        styles.courseLevel,
-                        course.level === "Intermediate"
-                          ? styles.intermediateLevel
-                          : styles.beginnerLevel,
-                      ]}>
-                      {course.level}
-                    </Text>
-                  </View>
-                </View>
+            style={styles.horizontalScroll}
+            contentContainerStyle={styles.horizontalScrollContent}>
+            {activeCourses.map((course, index) => (
+              <View key={index} style={styles.courseCard}>
+                <Image
+                  source={require("../assets/course.png")}
+                  style={[styles.courseImage, { height: 150 }]}
+                  resizeMode="cover"
+                />
+                <Text
+                  style={[
+                    styles.courseInstructor,
+                    { marginBottom: 2, fontSize: 12 },
+                  ]}>
+                  {course.instructor}
+                </Text>
+
+                <Text
+                  style={styles.courseTitle}
+                  numberOfLines={1}
+                  ellipsizeMode="tail">
+                  {course.title}
+                </Text>
+
+                <Text
+                  style={[
+                    styles.courseInstructor,
+                    {
+                      marginBottom: 2,
+                      fontSize: 12,
+                      justifyContent: "space-evenly",
+                    },
+                  ]}>
+                  <Ionicons name="star" size={13} color={"#E7670C"} /> - 4.8 -{" "}
+                  5hr 10m - Intermediate
+                </Text>
               </View>
             ))}
           </ScrollView>
@@ -582,7 +633,7 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: "#4A6FFF",
+    backgroundColor: "#E7670C",
     alignItems: "center",
     justifyContent: "center",
     marginRight: 4,
@@ -608,13 +659,14 @@ const styles = StyleSheet.create({
     // Active state styling
   },
   navText: {
-    fontSize: 16,
+    fontSize: 13,
     color: "#666",
     fontWeight: "500",
   },
   activeNavText: {
-    color: "#4A6FFF",
+    color: "#000",
     fontWeight: "600",
+    fontSize: 14,
   },
   navIndicator: {
     position: "absolute",
@@ -622,7 +674,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 3,
-    backgroundColor: "#4A6FFF",
     borderRadius: 1.5,
   },
   // Profile Dropdown Styles
@@ -761,9 +812,11 @@ const styles = StyleSheet.create({
   },
   section: {
     paddingHorizontal: 20,
-    marginBottom: 24,
-    backgroundColor: "red",
-    width: "100%",
+    marginVertical: 40,
+    // Remove the background colors when done debugging
+    // backgroundColor: "red",
+    width: "95%",
+    alignSelf: "center",
   },
   sectionHeader: {
     flexDirection: "row",
@@ -777,9 +830,13 @@ const styles = StyleSheet.create({
     color: "#000",
   },
   seeMoreLink: {
-    fontSize: 14,
-    color: "#4A6FFF",
+    fontSize: 12,
+    color: "#000",
     fontWeight: "500",
+    borderWidth: 1,
+    borderColor: "#E7670C",
+    padding: 8,
+    borderRadius: 8,
   },
   sectionSubtitle: {
     fontSize: 14,
@@ -787,48 +844,47 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   horizontalScroll: {
-    marginHorizontal: -5,
-    backgroundColor: "green",
+    // Remove debug background colors
+    // backgroundColor: "green",
   },
-  // Rest of the styles remain the same from previous implementation...
+  horizontalScrollContent: {
+    paddingRight: 20, // Add some padding at the end
+  },
+
+  // Course Card Styles
   courseCard: {
-    width: 160,
+    width: 250, // Fixed width for horizontal scrolling
     backgroundColor: "#fff",
     borderRadius: 12,
     padding: 16,
-    marginHorizontal: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  courseHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 12,
-  },
-  courseIcon: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    backgroundColor: "#F0F5FF",
-    alignItems: "center",
-    justifyContent: "center",
     marginRight: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  courseImage: {
+    width: "100%",
+    height: 90,
+    borderRadius: 8,
+    marginBottom: 12,
+    backgroundColor: "#f0f0f0", // Fallback color if image doesn't load
   },
   courseTitle: {
-    flex: 1,
     fontSize: 15,
     fontWeight: "600",
     color: "#000",
     lineHeight: 20,
+    marginBottom: 4,
   },
   courseInstructor: {
     fontSize: 12,
     color: "#666",
     marginBottom: 12,
   },
+
+  // Progress Bar Styles
   progressContainer: {
     marginBottom: 16,
   },
@@ -836,26 +892,29 @@ const styles = StyleSheet.create({
     height: 6,
     backgroundColor: "#f0f0f0",
     borderRadius: 3,
-    marginBottom: 8,
+    marginBottom: 6,
+    overflow: "hidden",
   },
   progressFill: {
     height: "100%",
-    backgroundColor: "#4A6FFF",
+    backgroundColor: "#087B2E",
     borderRadius: 3,
   },
   progressText: {
     fontSize: 11,
     color: "#666",
-    textAlign: "center",
+    textAlign: "left",
   },
+
+  // Button Styles
   continueCourseBtn: {
-    backgroundColor: "#F0F5FF",
+    backgroundColor: "#E7670C",
     paddingVertical: 10,
     borderRadius: 8,
     alignItems: "center",
   },
   continueCourseText: {
-    color: "#4A6FFF",
+    color: "#fff",
     fontSize: 14,
     fontWeight: "500",
   },
@@ -890,7 +949,7 @@ const styles = StyleSheet.create({
     color: "#666",
   },
   certificateBtn: {
-    backgroundColor: "#4CAF50",
+    backgroundColor: "#E7670C",
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 6,
