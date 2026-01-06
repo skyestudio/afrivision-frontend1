@@ -142,11 +142,10 @@ export default function Dashboard() {
 
   // Profile dropdown items
   const profileDropdownItems = [
-    { id: 1, label: "My Profile", icon: "person" },
-    { id: 2, label: "Settings", icon: "settings" },
-    { id: 3, label: "Billing", icon: "card" },
-    { id: 4, label: "Help Center", icon: "help-circle" },
-    { id: 5, label: "Logout", icon: "log-out" },
+    { id: 1, label: "Profile", icon: "person" },
+    { id: 2, label: "My Plan", icon: "card" },
+    { id: 3, label: "Settings", icon: "settings" },
+    { id: 4, label: "Logout", icon: "log-out" },
   ];
 
   // Progress bar component
