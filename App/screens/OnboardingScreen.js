@@ -11,10 +11,12 @@ import {
 import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 const { width } = Dimensions.get("window");
 
 export default function OnboardingScreen() {
+  const navigation = useNavigation();
   const [currentStep, setCurrentStep] = useState(0);
   const [step1Selections, setStep1Selections] = useState([]);
   const [step2Selections, setStep2Selections] = useState([]);
@@ -213,7 +215,8 @@ export default function OnboardingScreen() {
     };
     console.log("User onboarding data:", userData);
     // Navigate to main app
-    alert("Onboarding completed! Data saved.");
+    // alert("Onboarding completed! Data saved.");
+    navigation.navigate("LoginScreen");
   };
 
   const handleSkip = () => {

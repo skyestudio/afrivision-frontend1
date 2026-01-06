@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen({}) {
+  const navigation = useNavigation();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -23,6 +25,7 @@ export default function LoginScreen({ navigation }) {
 
   const handleSignIn = () => {
     console.log("Login Data:", formData);
+    navigation.navigate("DashboardScreen");
     // Handle login logic here
   };
 
@@ -86,24 +89,29 @@ export default function LoginScreen({ navigation }) {
               />
             </View>
 
-            {/* Forgot Password Link */}
-            <TouchableOpacity
-              style={styles.forgotLink}
-              onPress={() => navigation.navigate("ForgotPassword")}>
-              <Text style={styles.forgotText}>Forgot Account</Text>
-            </TouchableOpacity>
+            <View>
+              <TouchableOpacity
+                style={styles.signInButton}
+                onPress={handleSignIn}>
+                <Text style={styles.signInText}>Sign in</Text>
+              </TouchableOpacity>
+
+              {/* Forgot Password Link */}
+              <TouchableOpacity
+                style={styles.forgotLink}
+                onPress={() => navigation.navigate("ForgotPassword")}>
+                <Text style={styles.forgotText}>Forgot Account</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </ScrollView>
 
         {/* Fixed Buttons at Bottom */}
         <View style={styles.buttonContainer}>
-          <TouchableOpacity style={styles.signInButton} onPress={handleSignIn}>
-            <Text style={styles.signInText}>Sign in</Text>
-          </TouchableOpacity>
-
           <View style={styles.signUpContainer}>
             <Text style={styles.signUpText}>Don't Have Account: </Text>
-            <TouchableOpacity onPress={() => navigation.navigate("SignUp")}>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("SignupScreen")}>
               <Text style={styles.signUpLink}>Sign Up</Text>
             </TouchableOpacity>
           </View>
@@ -187,7 +195,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 18,
-    color: "#4a6cf7",
+    color: "#351414ff",
     fontWeight: "600",
     marginTop: 12,
   },
@@ -224,13 +232,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   forgotLink: {
-    alignSelf: "flex-end",
+    alignSelf: "center",
     marginTop: 5,
   },
   forgotText: {
-    color: "#4a6cf7",
+    color: "#000",
     fontSize: 14,
-    fontWeight: "600",
+    fontWeight: "400",
+    textDecorationLine: "underline",
   },
   buttonContainer: {
     position: "fixed",
@@ -246,10 +255,10 @@ const styles = StyleSheet.create({
 
   signInButton: {
     backgroundColor: "#E7670C",
-    borderRadius: 10,
+    borderRadius: 10000,
     paddingVertical: 16,
     alignItems: "center",
-    width: "50%",
+    width: "30%",
     marginBottom: 16,
     alignSelf: "center",
   },
@@ -269,7 +278,7 @@ const styles = StyleSheet.create({
   },
   signUpLink: {
     fontSize: 14,
-    color: "#4a6cf7",
+    color: "#000",
     fontWeight: "600",
   },
 });

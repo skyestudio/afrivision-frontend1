@@ -9,8 +9,10 @@ import {
 } from "react-native";
 import React, { useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { useNavigation } from "@react-navigation/native";
 
 export default function SignupScreen() {
+  const navigation = useNavigation();
   const [formData, setFormData] = useState({
     name: "",
     mobile: "",
@@ -30,6 +32,8 @@ export default function SignupScreen() {
   };
 
   const handleSignUp = () => {
+    navigation.navigate("LoginScreen");
+
     console.log("Form Data:", formData);
     // Handle signup logic here
   };
@@ -258,7 +262,8 @@ export default function SignupScreen() {
 
           <View style={styles.signInContainer}>
             <Text style={styles.signInText}>Already have an account? </Text>
-            <TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => navigation.navigate("LoginScreen")}>
               <Text style={styles.signInLink}>Sign In</Text>
             </TouchableOpacity>
           </View>
