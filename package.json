@@ -6,7 +6,10 @@
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "vercel-build": "expo export --platform web",
+    "build": "expo export --platform web",
+    "deploy": "npm run vercel-build && vercel --prod"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
