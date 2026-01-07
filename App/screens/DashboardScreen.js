@@ -14,11 +14,11 @@ import {
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProgressCircle from "../components/ProgressCircle";
+import TopNav from "../components/TopNav";
 
 const { width } = Dimensions.get("window");
 
-export default function Dashboard() {
-  const [activeNav, setActiveNav] = useState("Dashboard");
+export default function DashboardScreen() {
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [searchText, setSearchText] = useState("");
 
@@ -162,128 +162,7 @@ export default function Dashboard() {
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#fff" />
 
-      {/* Top Header with Logo, Search, Notification and Profile */}
-      <View style={styles.topHeader}>
-        {/* Logo */}
-        <Image
-          source={require("../assets/logo.png")} // Update with your logo path
-          style={styles.logo}
-          resizeMode="contain"
-        />
-
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="What do you want to learn"
-            placeholderTextColor="#999"
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <TouchableOpacity style={styles.searchButton}>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
-        {/* Navigation Tabs */}
-        <View style={styles.navContainer}>
-          <TouchableOpacity
-            style={[
-              styles.navItem,
-              activeNav === "Home" && styles.activeNavItem,
-            ]}
-            onPress={() => setActiveNav("Home")}>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "Home" && styles.activeNavText,
-              ]}>
-              Home
-            </Text>
-            {activeNav === "Home" && <View style={styles.navIndicator} />}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.navItem,
-              activeNav === "Dashboard" && styles.activeNavItem,
-            ]}
-            onPress={() => setActiveNav("Dashboard")}>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "Dashboard" && styles.activeNavText,
-              ]}>
-              Dashboard
-            </Text>
-            {activeNav === "Dashboard" && <View style={styles.navIndicator} />}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.navItem,
-              activeNav === "My Courses" && styles.activeNavItem,
-            ]}
-            onPress={() => setActiveNav("My Courses")}>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "My Courses" && styles.activeNavText,
-              ]}>
-              My Courses
-            </Text>
-            {activeNav === "My Courses" && <View style={styles.navIndicator} />}
-          </TouchableOpacity>
-        </View>
-
-        {/* Notification and Profile */}
-        <View style={styles.rightIcons}>
-          <TouchableOpacity style={styles.notificationBtn}>
-            <Ionicons name="notifications-outline" size={24} color="#333" />
-            <View style={styles.notificationDot} />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.profileContainer}
-            onPress={() => setShowProfileDropdown(!showProfileDropdown)}>
-            <View style={styles.profileImage}>
-              <Text style={styles.profileInitial}>J</Text>
-            </View>
-            <Ionicons
-              name={showProfileDropdown ? "chevron-up" : "chevron-down"}
-              size={16}
-              color="#666"
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Profile Dropdown Modal */}
-      <Modal
-        visible={showProfileDropdown}
-        transparent={true}
-        animationType="fade"
-        onRequestClose={() => setShowProfileDropdown(false)}>
-        <TouchableOpacity
-          style={styles.dropdownOverlay}
-          activeOpacity={1}
-          onPress={() => setShowProfileDropdown(false)}>
-          <View style={styles.dropdownContainer}>
-            {profileDropdownItems.map((item) => (
-              <TouchableOpacity
-                key={item.id}
-                style={styles.dropdownItem}
-                onPress={() => {
-                  setShowProfileDropdown(false);
-                  console.log(`${item.label} clicked`);
-                }}>
-                <Ionicons name={item.icon} size={20} color="#666" />
-                <Text style={styles.dropdownText}>{item.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        </TouchableOpacity>
-      </Modal>
+      <TopNav activeNav={"Dashboard"} />
 
       {/* Dashboard Content */}
       <ScrollView

@@ -7,6 +7,7 @@ import LoginScreen from "./App/screens/LoginScreen";
 import ForgotPasswordScreen from "./App/screens/ForgotPasswordScreen";
 import OnboardingScreen from "./App/screens/OnboardingScreen";
 import DashboardScreen from "./App/screens/DashboardScreen";
+import MyCourses from "./App/screens/MyCourses";
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="OnboardingScreen" component={OnboardingScreen} />
+          <Stack.Screen name="MyCourses" component={MyCourses} />
 
           <Stack.Screen name="DashboardScreen" component={DashboardScreen} />
 

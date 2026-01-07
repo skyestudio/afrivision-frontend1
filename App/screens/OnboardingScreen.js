@@ -670,6 +670,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     color: "#333",
     marginLeft: 5,
+    marginRight: 10,
   },
   optionButtonTextSelected: {
     color: "#E7670C",
