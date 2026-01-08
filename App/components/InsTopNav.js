@@ -37,20 +37,6 @@ export default function TopNav({}) {
           resizeMode="contain"
         />
 
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="What do you want to learn"
-            placeholderTextColor="#999"
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-          <TouchableOpacity style={styles.searchButton}>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
-          </TouchableOpacity>
-        </View>
-
         {/* Navigation Tabs */}
         <View style={styles.navContainer}>
           <TouchableOpacity
@@ -105,6 +91,25 @@ export default function TopNav({}) {
               My Courses
             </Text>
             {activeNav === "My Courses" && <View style={styles.navIndicator} />}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.navItem,
+              activeNav === "Assessment" && styles.activeNavItem,
+            ]}
+            onPress={() => {
+              setActiveNav("Assessment");
+              navigation.navigate("Assessment");
+            }}>
+            <Text
+              style={[
+                styles.navText,
+                activeNav === "Assessment" && styles.activeNavText,
+              ]}>
+              Assessment
+            </Text>
+            {activeNav === "Assessment" && <View style={styles.navIndicator} />}
           </TouchableOpacity>
         </View>
 
@@ -174,6 +179,7 @@ const styles = StyleSheet.create({
     right: 0,
     left: 0,
     zIndex: 8888,
+    marginHorizontal: 50,
   },
   logo: {
     width: 40,
@@ -251,7 +257,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     paddingBottom: 0,
-    backgroundColor: "#fff",
+    // backgroundColor: "red",
+    width: "80%",
+    justifyContent: "flex-end",
+    //  backgroundColor: "red",
   },
   navItem: {
     marginRight: 30,

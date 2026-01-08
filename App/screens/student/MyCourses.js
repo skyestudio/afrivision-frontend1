@@ -7,7 +7,7 @@ import {
 } from "react-native";
 import React from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TopNav from "../components/TopNav";
+import TopNav from "../../components/TopNav";
 import { Ionicons } from "@expo/vector-icons";
 
 const STATUS_COLORS = {

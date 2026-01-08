@@ -24,7 +24,7 @@ export default function ForgotPasswordScreen({ navigation }) {
       {/* Fixed Left Side with Image */}
       <View style={styles.leftSide}>
         <Image
-          source={require("../assets/girl.png")}
+          source={require("../../assets/girl.png")}
           style={styles.girlImage}
           resizeMode="cover"
         />
@@ -35,7 +35,7 @@ export default function ForgotPasswordScreen({ navigation }) {
         {/* Logo and Header */}
         <View style={styles.logoContainer}>
           <Image
-            source={require("../assets/logo.png")}
+            source={require("../../assets/logo.png")}
             style={styles.logoImage}
           />
           <Text style={styles.logoText}>It's Alright!</Text>

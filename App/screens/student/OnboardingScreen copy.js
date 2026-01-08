@@ -176,7 +176,7 @@ export default function OnboardingScreen({ navigation }) {
       {/* Fixed Left Side with Image */}
       <View style={styles.leftSide}>
         <Image
-          source={require("../assets/girl.png")}
+          source={require("../../assets/girl.png")}
           style={styles.girlImage}
           resizeMode="cover"
         />

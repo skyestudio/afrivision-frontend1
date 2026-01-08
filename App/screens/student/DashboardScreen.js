@@ -13,8 +13,8 @@ import {
 } from "react-native";
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
-import ProgressCircle from "../components/ProgressCircle";
-import TopNav from "../components/TopNav";
+import ProgressCircle from "../../components/ProgressCircle";
+import TopNav from "../../components/TopNav";
 
 const { width } = Dimensions.get("window");
 
@@ -220,7 +220,7 @@ export default function DashboardScreen() {
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
-                  source={require("../assets/course.png")}
+                  source={require("../../assets/course.png")}
                   style={styles.courseImage}
                   resizeMode="cover"
                 />
@@ -275,7 +275,7 @@ export default function DashboardScreen() {
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
-                  source={require("../assets/course.png")}
+                  source={require("../../assets/course.png")}
                   style={styles.courseImage}
                   resizeMode="cover"
                 />
@@ -382,7 +382,7 @@ export default function DashboardScreen() {
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
-                  source={require("../assets/course.png")}
+                  source={require("../../assets/course.png")}
                   style={[styles.courseImage, { height: 150 }]}
                   resizeMode="cover"
                 />

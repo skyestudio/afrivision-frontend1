@@ -8,7 +8,7 @@ import {
   StatusBar,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import TopNav from "../components/TopNav";
+import TopNav from "../../components/TopNav";
 
 export default function MyCourses() {
   const courses = [
