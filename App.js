@@ -19,6 +19,7 @@ import IncMyStudentsScreen from "./App/screens/instructor/IncMyStudentsScreen";
 import InsDashboard from "./App/screens/instructor/InsDashboard";
 import InsAssessment from "./App/screens/instructor/InsAssessment";
 import InstructorProfileScreen from "./App/screens/instructor/InstructorProfileScreen";
+import InsAccountSettingsScreen from "./App/screens/instructor/AccountSettingsScreen";
 
 const Stack = createStackNavigator();
 
@@ -27,6 +28,10 @@ export default function App() {
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Screen
+            name="InsAccountSettingsScreen"
+            component={InsAccountSettingsScreen}
+          />
           <Stack.Screen
             name="InstructorProfileScreen"
             component={InstructorProfileScreen}

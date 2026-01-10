@@ -9,6 +9,7 @@ import {
   Dimensions,
   TextInput,
   Modal,
+  useWindowDimensions,
 } from "react-native";
 import React, { useState, useEffect, useCallback } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -16,10 +17,16 @@ import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
 export default function InsTopNav({}) {
   const navigation = useNavigation();
-  const route = useRoute(); // Get current route info
+  const route = useRoute();
+  const { width } = useWindowDimensions();
+
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [activeNav, setActiveNav] = useState("Dashboard");
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
 
   // Map route names to tab names
   const routeToTabMap = {
@@ -45,118 +52,195 @@ export default function InsTopNav({}) {
     { id: 4, label: "Logout", icon: "log-out" },
   ];
 
+  // Navigation items for mobile menu
+  const navItems = [
+    { name: "Dashboard", screen: "InsDashboard" },
+    {
+      name: "My Courses",
+      screen: "IncMyCoursesScreen",
+      tabName: "IncMyCoursesScreen",
+    },
+    {
+      name: "My Students",
+      screen: "IncMyStudentsScreen",
+      tabName: "IncMyStudentsScreen",
+    },
+    { name: "Assessment", screen: "Assessment" },
+  ];
+
   // Helper function to navigate and set active tab
   const handleTabPress = (tabName, screenName) => {
     setActiveNav(tabName);
     navigation.navigate(screenName);
+    setShowMobileMenu(false);
+  };
+
+  const handleMobileNavPress = (item) => {
+    handleTabPress(item.tabName || item.name, item.screen);
   };
 
   return (
     <>
-      <View style={styles.topHeader}>
-        {/* Logo */}
-        <Image
-          source={require("../assets/logo.png")}
-          style={styles.logo}
-          resizeMode="contain"
-        />
+      <View
+        style={[
+          styles.topHeader,
+          isMobile && styles.topHeaderMobile,
+          isTablet && styles.topHeaderTablet,
+        ]}>
+        {/* Logo and Mobile Menu Toggle */}
+        <View
+          style={[styles.leftSection, isMobile && styles.leftSectionMobile]}>
+          {isMobile && (
+            <TouchableOpacity
+              style={styles.menuButton}
+              onPress={() => setShowMobileMenu(!showMobileMenu)}>
+              <Ionicons
+                name={showMobileMenu ? "close" : "menu"}
+                size={24}
+                color="#333"
+              />
+            </TouchableOpacity>
+          )}
 
-        {/* Navigation Tabs */}
-        <View style={styles.navContainer}>
-          <TouchableOpacity
+          <Image
+            source={require("../assets/logo.png")}
             style={[
-              styles.navItem,
-              activeNav === "Dashboard" && styles.activeNavItem,
+              styles.logo,
+              isMobile && styles.logoMobile,
+              isTablet && styles.logoTablet,
             ]}
-            onPress={() => handleTabPress("Dashboard", "InsDashboard")}>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "Dashboard" && styles.activeNavText,
-              ]}>
-              Dashboard
-            </Text>
-            {activeNav === "Dashboard" && <View style={styles.navIndicator} />}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.navItem,
-              activeNav === "IncMyCoursesScreen" && styles.activeNavItem,
-            ]}
-            onPress={() =>
-              handleTabPress("IncMyCoursesScreen", "IncMyCoursesScreen")
-            }>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "IncMyCoursesScreen" && styles.activeNavText,
-              ]}>
-              My Courses
-            </Text>
-            {activeNav === "IncMyCoursesScreen" && (
-              <View style={styles.navIndicator} />
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.navItem,
-              activeNav === "IncMyStudentsScreen" && styles.activeNavItem,
-            ]}
-            onPress={() =>
-              handleTabPress("IncMyStudentsScreen", "IncMyStudentsScreen")
-            }>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "IncMyStudentsScreen" && styles.activeNavText,
-              ]}>
-              My Students
-            </Text>
-            {activeNav === "IncMyStudentsScreen" && (
-              <View style={styles.navIndicator} />
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.navItem,
-              activeNav === "Assessment" && styles.activeNavItem,
-            ]}
-            onPress={() => handleTabPress("Assessment", "Assessment")}>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "Assessment" && styles.activeNavText,
-              ]}>
-              Assessment
-            </Text>
-            {activeNav === "Assessment" && <View style={styles.navIndicator} />}
-          </TouchableOpacity>
+            resizeMode="contain"
+          />
         </View>
 
-        {/* Notification and Profile */}
-        <View style={styles.rightIcons}>
-          <TouchableOpacity style={styles.notificationBtn}>
-            <Ionicons name="notifications-outline" size={24} color="#333" />
-            <View style={styles.notificationDot} />
-          </TouchableOpacity>
+        {/* Desktop Navigation Tabs */}
+        {!isMobile ? (
+          <View
+            style={[
+              styles.navContainer,
+              isTablet && styles.navContainerTablet,
+            ]}>
+            {navItems.map((item) => (
+              <TouchableOpacity
+                key={item.name}
+                style={[
+                  styles.navItem,
+                  activeNav === (item.tabName || item.name) &&
+                    styles.activeNavItem,
+                  isTablet && styles.navItemTablet,
+                ]}
+                onPress={() =>
+                  handleTabPress(item.tabName || item.name, item.screen)
+                }>
+                <Text
+                  style={[
+                    styles.navText,
+                    activeNav === (item.tabName || item.name) &&
+                      styles.activeNavText,
+                    isTablet && styles.navTextTablet,
+                  ]}>
+                  {item.name}
+                </Text>
+                {activeNav === (item.tabName || item.name) && (
+                  <View style={styles.navIndicator} />
+                )}
+              </TouchableOpacity>
+            ))}
+          </View>
+        ) : (
+          // Mobile search and profile on right
+          <View style={styles.rightSectionMobile}>
+            <TouchableOpacity style={styles.mobileSearchButton}>
+              <Ionicons name="search-outline" size={20} color="#333" />
+            </TouchableOpacity>
 
+            <TouchableOpacity style={styles.notificationBtnMobile}>
+              <Ionicons name="notifications-outline" size={20} color="#333" />
+              <View style={styles.notificationDot} />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Desktop Right Icons */}
+        {!isMobile && (
+          <View
+            style={[styles.rightIcons, isTablet && styles.rightIconsTablet]}>
+            <TouchableOpacity style={styles.notificationBtn}>
+              <Ionicons name="notifications-outline" size={24} color="#333" />
+              <View style={styles.notificationDot} />
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.profileContainer}
+              onPress={() => setShowProfileDropdown(!showProfileDropdown)}>
+              <View style={styles.profileImage}>
+                <Text style={styles.profileInitial}>J</Text>
+              </View>
+              <Ionicons
+                name={showProfileDropdown ? "chevron-up" : "chevron-down"}
+                size={16}
+                color="#666"
+              />
+            </TouchableOpacity>
+          </View>
+        )}
+
+        {/* Mobile Profile Icon */}
+        {isMobile && (
           <TouchableOpacity
-            style={styles.profileContainer}
+            style={styles.profileContainerMobile}
             onPress={() => setShowProfileDropdown(!showProfileDropdown)}>
-            <View style={styles.profileImage}>
+            <View style={styles.profileImageMobile}>
               <Text style={styles.profileInitial}>J</Text>
             </View>
-            <Ionicons
-              name={showProfileDropdown ? "chevron-up" : "chevron-down"}
-              size={16}
-              color="#666"
-            />
           </TouchableOpacity>
-        </View>
+        )}
       </View>
+
+      {/* Mobile Navigation Menu */}
+      {isMobile && showMobileMenu && (
+        <View style={styles.mobileMenu}>
+          <ScrollView style={styles.mobileMenuScroll}>
+            {navItems.map((item) => (
+              <TouchableOpacity
+                key={item.name}
+                style={[
+                  styles.mobileMenuItem,
+                  activeNav === (item.tabName || item.name) &&
+                    styles.mobileMenuItemActive,
+                ]}
+                onPress={() => handleMobileNavPress(item)}>
+                <Text
+                  style={[
+                    styles.mobileMenuText,
+                    activeNav === (item.tabName || item.name) &&
+                      styles.mobileMenuTextActive,
+                  ]}>
+                  {item.name}
+                </Text>
+                {activeNav === (item.tabName || item.name) && (
+                  <Ionicons name="chevron-forward" size={16} color="#E7670C" />
+                )}
+              </TouchableOpacity>
+            ))}
+
+            {/* Profile options in mobile menu */}
+            <View style={styles.mobileMenuDivider} />
+            {profileDropdownItems.map((item) => (
+              <TouchableOpacity
+                key={item.id}
+                style={styles.mobileMenuItem}
+                onPress={() => {
+                  setShowMobileMenu(false);
+                  console.log(`${item.label} clicked`);
+                }}>
+                <Ionicons name={item.icon} size={20} color="#666" />
+                <Text style={styles.mobileMenuText}>{item.label}</Text>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
+      )}
 
       {/* Profile Dropdown Modal */}
       <Modal
@@ -168,7 +252,12 @@ export default function InsTopNav({}) {
           style={styles.dropdownOverlay}
           activeOpacity={1}
           onPress={() => setShowProfileDropdown(false)}>
-          <View style={styles.dropdownContainer}>
+          <View
+            style={[
+              styles.dropdownContainer,
+              isMobile && styles.dropdownContainerMobile,
+              isTablet && styles.dropdownContainerTablet,
+            ]}>
             {profileDropdownItems.map((item) => (
               <TouchableOpacity
                 key={item.id}
@@ -195,56 +284,111 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 12,
     backgroundColor: "#fff",
-
-    justifyContent: "space-around",
+    justifyContent: "space-between",
     position: "absolute",
     top: 0,
     right: 0,
     left: 0,
-    zIndex: 8888,
-    marginHorizontal: 50,
+    zIndex: 1000,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f0f0f0",
+  },
+  topHeaderMobile: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    justifyContent: "space-between",
+    marginHorizontal: 0,
+  },
+  topHeaderTablet: {
+    paddingHorizontal: 24,
+  },
+  leftSection: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  leftSectionMobile: {
+    flex: 1,
+  },
+  menuButton: {
+    padding: 8,
+    marginRight: 12,
   },
   logo: {
     width: 40,
     height: 40,
-    marginRight: 15,
   },
-  searchContainer: {
-    // flex: 1,
+  logoMobile: {
+    width: 36,
+    height: 36,
+  },
+  logoTablet: {
+    width: 38,
+    height: 38,
+  },
+  navContainer: {
     flexDirection: "row",
-    backgroundColor: "transaparent",
-    borderRadius: 25,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    alignItems: "center",
-    width: "30%",
-    borderWidth: 1,
-    borderColor: "#E7670C",
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 14,
-    color: "#333",
-    paddingVertical: 4,
-    outlineWidth: 0,
-  },
-  searchButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#E7670C",
     alignItems: "center",
     justifyContent: "center",
-    marginLeft: 10,
+    flex: 1,
+  },
+  navContainerTablet: {
+    paddingHorizontal: 10,
+  },
+  navItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    position: "relative",
+  },
+  navItemTablet: {
+    paddingHorizontal: 12,
+  },
+  activeNavItem: {
+    // Active state styling
+  },
+  navText: {
+    fontSize: 14,
+    color: "#666",
+    fontWeight: "500",
+  },
+  navTextTablet: {
+    fontSize: 13,
+  },
+  activeNavText: {
+    color: "#000",
+    fontWeight: "600",
+  },
+  navIndicator: {
+    position: "absolute",
+    bottom: 0,
+    left: 16,
+    right: 16,
+    height: 3,
+    backgroundColor: "#E7670C",
+    borderRadius: 1.5,
+  },
+  rightSectionMobile: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 12,
+  },
+  mobileSearchButton: {
+    padding: 8,
+    marginRight: 8,
   },
   rightIcons: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 15,
+  },
+  rightIconsTablet: {
+    marginLeft: 10,
   },
   notificationBtn: {
     position: "relative",
     padding: 8,
+  },
+  notificationBtnMobile: {
+    position: "relative",
+    padding: 6,
   },
   notificationDot: {
     position: "absolute",
@@ -258,7 +402,10 @@ const styles = StyleSheet.create({
   profileContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginLeft: 15,
+    marginLeft: 8,
+  },
+  profileContainerMobile: {
+    padding: 4,
   },
   profileImage: {
     width: 36,
@@ -269,47 +416,67 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginRight: 4,
   },
+  profileImageMobile: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#E7670C",
+    alignItems: "center",
+    justifyContent: "center",
+  },
   profileInitial: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",
   },
-  // Navigation Styles
-  navContainer: {
-    flexDirection: "row",
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    paddingBottom: 0,
-    // backgroundColor: "red",
-    width: "80%",
-    justifyContent: "flex-end",
-    //  backgroundColor: "red",
-  },
-  navItem: {
-    marginRight: 30,
-    paddingBottom: 8,
-    position: "relative",
-  },
-  activeNavItem: {
-    // Active state styling
-  },
-  navText: {
-    fontSize: 13,
-    color: "#666",
-    fontWeight: "500",
-  },
-  activeNavText: {
-    color: "#000",
-    fontWeight: "600",
-    fontSize: 14,
-  },
-  navIndicator: {
+  // Mobile Menu Styles
+  mobileMenu: {
     position: "absolute",
-    bottom: 0,
+    top: 60,
     left: 0,
     right: 0,
-    height: 3,
-    borderRadius: 1.5,
+    backgroundColor: "#fff",
+    borderTopWidth: 1,
+    borderTopColor: "#f0f0f0",
+    zIndex: 999,
+    maxHeight: 400,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  mobileMenuScroll: {
+    paddingVertical: 8,
+  },
+  mobileMenuItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f5f5f5",
+  },
+  mobileMenuItemActive: {
+    backgroundColor: "#fef6ef",
+    borderLeftWidth: 3,
+    borderLeftColor: "#E7670C",
+  },
+  mobileMenuText: {
+    fontSize: 16,
+    color: "#333",
+    fontWeight: "500",
+  },
+  mobileMenuTextActive: {
+    color: "#E7670C",
+    fontWeight: "600",
+  },
+  mobileMenuDivider: {
+    height: 1,
+    backgroundColor: "#e0e0e0",
+    marginVertical: 8,
+    marginHorizontal: 24,
   },
   // Profile Dropdown Styles
   dropdownOverlay: {
@@ -333,6 +500,16 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 5,
   },
+  dropdownContainerMobile: {
+    top: 70,
+    right: 16,
+    minWidth: 180,
+  },
+  dropdownContainerTablet: {
+    top: 90,
+    right: 24,
+    minWidth: 180,
+  },
   dropdownItem: {
     flexDirection: "row",
     alignItems: "center",
@@ -344,5 +521,31 @@ const styles = StyleSheet.create({
     color: "#333",
     marginLeft: 12,
     fontWeight: "500",
+  },
+  searchContainer: {
+    flexDirection: "row",
+    backgroundColor: "transparent",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    alignItems: "center",
+    width: "30%",
+    borderWidth: 1,
+    borderColor: "#E7670C",
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 14,
+    color: "#333",
+    paddingVertical: 4,
+  },
+  searchButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: "#E7670C",
+    alignItems: "center",
+    justifyContent: "center",
+    marginLeft: 10,
   },
 });
