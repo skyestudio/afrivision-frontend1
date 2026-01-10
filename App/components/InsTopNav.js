@@ -10,15 +10,32 @@ import {
   TextInput,
   Modal,
 } from "react-native";
-import React, { useState } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
-export default function TopNav({}) {
+export default function InsTopNav({}) {
   const navigation = useNavigation();
+  const route = useRoute(); // Get current route info
   const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const [searchText, setSearchText] = useState("");
   const [activeNav, setActiveNav] = useState("Dashboard");
+
+  // Map route names to tab names
+  const routeToTabMap = {
+    InsDashboard: "Dashboard",
+    IncMyCoursesScreen: "IncMyCoursesScreen",
+    IncMyStudentsScreen: "IncMyStudentsScreen",
+    Assessment: "Assessment",
+  };
+
+  // Update active tab based on current route
+  useEffect(() => {
+    const currentRouteName = route.name;
+    if (routeToTabMap[currentRouteName]) {
+      setActiveNav(routeToTabMap[currentRouteName]);
+    }
+  }, [route.name]);
 
   // Profile dropdown items
   const profileDropdownItems = [
@@ -27,12 +44,19 @@ export default function TopNav({}) {
     { id: 3, label: "Settings", icon: "settings" },
     { id: 4, label: "Logout", icon: "log-out" },
   ];
+
+  // Helper function to navigate and set active tab
+  const handleTabPress = (tabName, screenName) => {
+    setActiveNav(tabName);
+    navigation.navigate(screenName);
+  };
+
   return (
     <>
       <View style={styles.topHeader}>
         {/* Logo */}
         <Image
-          source={require("../assets/logo.png")} // Update with your logo path
+          source={require("../assets/logo.png")}
           style={styles.logo}
           resizeMode="contain"
         />
@@ -42,28 +66,9 @@ export default function TopNav({}) {
           <TouchableOpacity
             style={[
               styles.navItem,
-              activeNav === "Home" && styles.activeNavItem,
-            ]}
-            onPress={() => setActiveNav("Home")}>
-            <Text
-              style={[
-                styles.navText,
-                activeNav === "Home" && styles.activeNavText,
-              ]}>
-              Home
-            </Text>
-            {activeNav === "Home" && <View style={styles.navIndicator} />}
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[
-              styles.navItem,
               activeNav === "Dashboard" && styles.activeNavItem,
             ]}
-            onPress={() => {
-              setActiveNav("Dashboard");
-              navigation.navigate("DashboardScreen");
-            }}>
+            onPress={() => handleTabPress("Dashboard", "InsDashboard")}>
             <Text
               style={[
                 styles.navText,
@@ -77,20 +82,41 @@ export default function TopNav({}) {
           <TouchableOpacity
             style={[
               styles.navItem,
-              activeNav === "My Courses" && styles.activeNavItem,
+              activeNav === "IncMyCoursesScreen" && styles.activeNavItem,
             ]}
-            onPress={() => {
-              setActiveNav("My Courses");
-              navigation.navigate("MyCourses");
-            }}>
+            onPress={() =>
+              handleTabPress("IncMyCoursesScreen", "IncMyCoursesScreen")
+            }>
             <Text
               style={[
                 styles.navText,
-                activeNav === "My Courses" && styles.activeNavText,
+                activeNav === "IncMyCoursesScreen" && styles.activeNavText,
               ]}>
               My Courses
             </Text>
-            {activeNav === "My Courses" && <View style={styles.navIndicator} />}
+            {activeNav === "IncMyCoursesScreen" && (
+              <View style={styles.navIndicator} />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.navItem,
+              activeNav === "IncMyStudentsScreen" && styles.activeNavItem,
+            ]}
+            onPress={() =>
+              handleTabPress("IncMyStudentsScreen", "IncMyStudentsScreen")
+            }>
+            <Text
+              style={[
+                styles.navText,
+                activeNav === "IncMyStudentsScreen" && styles.activeNavText,
+              ]}>
+              My Students
+            </Text>
+            {activeNav === "IncMyStudentsScreen" && (
+              <View style={styles.navIndicator} />
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -98,10 +124,7 @@ export default function TopNav({}) {
               styles.navItem,
               activeNav === "Assessment" && styles.activeNavItem,
             ]}
-            onPress={() => {
-              setActiveNav("Assessment");
-              navigation.navigate("Assessment");
-            }}>
+            onPress={() => handleTabPress("Assessment", "Assessment")}>
             <Text
               style={[
                 styles.navText,

@@ -15,6 +15,10 @@ import AccountSettingsScreen from "./App/screens/student/AccountSettingsScreen";
 import OnboardingScreen from "./App/screens/OnboardingScreen";
 import IncMyCoursesScreen from "./App/screens/instructor/IncMyCoursesScreen";
 import CreateCourseScreen from "./App/screens/instructor/CreateCourseScreen";
+import IncMyStudentsScreen from "./App/screens/instructor/IncMyStudentsScreen";
+import InsDashboard from "./App/screens/instructor/InsDashboard";
+import InsAssessment from "./App/screens/instructor/InsAssessment";
+import InstructorProfileScreen from "./App/screens/instructor/InstructorProfileScreen";
 
 const Stack = createStackNavigator();
 
@@ -24,9 +28,19 @@ export default function App() {
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen
+            name="InstructorProfileScreen"
+            component={InstructorProfileScreen}
+          />
+          <Stack.Screen name="InsAssessment" component={InsAssessment} />
+          <Stack.Screen
+            name="IncMyStudentsScreen"
+            component={IncMyStudentsScreen}
+          />
+          <Stack.Screen
             name="CreateCourseScreen"
             component={CreateCourseScreen}
           />
+          <Stack.Screen name="InsDashboard" component={InsDashboard} />
           <Stack.Screen
             name="IncMyCoursesScreen"
             component={IncMyCoursesScreen}
@@ -43,12 +57,10 @@ export default function App() {
             name="QuizOverviewScreen"
             component={QuizOverviewScreen}
           />
-
           <Stack.Screen
             name="LessonPlayerScreen"
             component={LessonPlayerScreen}
           />
-
           <Stack.Screen
             name="CourseContentScreen"
             component={CourseContentScreen}

@@ -192,7 +192,7 @@ function CurriculumBuilderStep({
 
       <ScrollView
         style={styles.curriculumScroll}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={true}>
         <View style={styles.previewSection}>
           <Text style={styles.sectionTitle}>Preview</Text>
 
@@ -900,7 +900,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   curriculumScroll: {
-    flex: 1,
+    //flex: 1,
+    height: 1,
+    // backgroundColor: "red",
+    width: "100%",
   },
   previewSection: {
     marginBottom: 20,
@@ -1232,6 +1235,7 @@ const styles = StyleSheet.create({
     paddingTop: 24,
     borderTopWidth: 1,
     borderTopColor: "#e5e7eb",
+    //  backgroundColor: "red",
   },
   draftBtn: {
     paddingHorizontal: 20,
