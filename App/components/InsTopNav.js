@@ -46,10 +46,30 @@ export default function InsTopNav({}) {
 
   // Profile dropdown items
   const profileDropdownItems = [
-    { id: 1, label: "Profile", icon: "person" },
-    { id: 2, label: "My Plan", icon: "card" },
-    { id: 3, label: "Settings", icon: "settings" },
-    { id: 4, label: "Logout", icon: "log-out" },
+    {
+      id: 1,
+      label: "Profile",
+      icon: "person",
+      navScreen: "InstructorProfileScreen",
+    },
+    {
+      id: 2,
+      label: "My Plan",
+      icon: "card",
+      navScreen: "AccountSettingsScreen",
+    },
+    {
+      id: 3,
+      label: "Settings",
+      icon: "settings",
+      navScreen: "AccountSettingsScreen",
+    },
+    {
+      id: 4,
+      label: "Logout",
+      icon: "log-out",
+      navScreen: "AccountSettingsScreen",
+    },
   ];
 
   // Navigation items for mobile menu
@@ -263,8 +283,9 @@ export default function InsTopNav({}) {
                 key={item.id}
                 style={styles.dropdownItem}
                 onPress={() => {
-                  setShowProfileDropdown(false);
-                  console.log(`${item.label} clicked`);
+                  navigation.navigate(item.navScreen);
+                  //  setShowProfileDropdown(false);
+                  //  console.log(`${item.label} clicked`);
                 }}>
                 <Ionicons name={item.icon} size={20} color="#666" />
                 <Text style={styles.dropdownText}>{item.label}</Text>

@@ -12,6 +12,7 @@ import Checkbox from "expo-checkbox";
 import { Feather, Ionicons } from "@expo/vector-icons";
 import InsTopNav from "../../components/InsTopNav";
 import { SafeAreaView } from "react-native-safe-area-context";
+import InsBottomNav from "../../components/InsBottomNav";
 
 const studentsData = [
   {
@@ -364,8 +365,12 @@ export default function IncMyStudentsScreen() {
   return (
     <View style={styles.mainContainer}>
       <SafeAreaView style={styles.safeArea}>
-        <InsTopNav activeNav={"IncMyStudentsScreen"} />
-        <View style={styles.spacer}></View>
+        {!isMobile && (
+          <>
+            <InsTopNav activeNav={"IncMyStudentsScreen"} />
+            <View style={styles.spacer} />
+          </>
+        )}
 
         <View style={styles.innerContainer}>
           {/* Header */}
@@ -577,6 +582,12 @@ export default function IncMyStudentsScreen() {
             </View>
           )}
         </View>
+
+        {isMobile && (
+          <>
+            <InsBottomNav activeNav="Dashboard" />
+          </>
+        )}
       </SafeAreaView>
 
       {/* Student Details Modal */}
@@ -1279,6 +1290,7 @@ const mobileStyles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 20,
   },
   safeArea: {
     flex: 1,

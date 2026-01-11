@@ -12,6 +12,7 @@ import { Feather } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import InsTopNav from "../../components/InsTopNav";
 import { SafeAreaView } from "react-native-safe-area-context";
+import InsBottomNav from "../../components/InsBottomNav";
 
 const coursesData = [
   {
@@ -141,8 +142,12 @@ export default function IncMyCoursesScreen() {
   return (
     <View style={styles.mainContainer}>
       <SafeAreaView style={styles.safeArea}>
-        <InsTopNav activeNav={"IncMyCoursesScreen"} />
-        <View style={styles.spacer}></View>
+        {!isMobile && (
+          <>
+            <InsTopNav activeNav="IncMyCoursesScreen" />
+            <View style={styles.spacer} />
+          </>
+        )}
 
         <View style={styles.innerContainer}>
           {/* Header */}
@@ -364,6 +369,12 @@ export default function IncMyCoursesScreen() {
             </View>
           )}
         </View>
+
+        {isMobile && (
+          <>
+            <InsBottomNav activeNav="Dashboard" />
+          </>
+        )}
       </SafeAreaView>
     </View>
   );
@@ -377,9 +388,11 @@ const desktopStyles = StyleSheet.create({
   },
   safeArea: {
     flex: 1,
+    width: "90%",
+    alignSelf: "center",
   },
   spacer: {
-    height: 70,
+    height: 90,
   },
   innerContainer: {
     flex: 1,
@@ -478,9 +491,13 @@ const desktopStyles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   scrollView: {
-    flex: 1,
+    // flex: 1,
+    height: 1,
+    // backgroundColor: "red",
   },
   scrollViewContent: {
+    // backgroundColor: "red",
+
     paddingBottom: 100,
   },
   row: {
@@ -844,6 +861,7 @@ const mobileStyles = StyleSheet.create({
   mainContainer: {
     flex: 1,
     backgroundColor: "#fff",
+    paddingTop: 20,
   },
   safeArea: {
     flex: 1,
@@ -862,7 +880,7 @@ const mobileStyles = StyleSheet.create({
     marginBottom: 16,
   },
   heading: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "700",
     color: "#111827",
   },
@@ -895,7 +913,7 @@ const mobileStyles = StyleSheet.create({
   },
   sortText: {
     fontWeight: "500",
-    fontSize: 12,
+    fontSize: 11,
     color: "#374151",
   },
   // FIXED: Filters section with fixed height container
@@ -929,7 +947,7 @@ const mobileStyles = StyleSheet.create({
   filterText: {
     color: "#6b7280",
     fontWeight: "500",
-    fontSize: 13,
+    fontSize: 12,
     lineHeight: 18,
   },
   filterTextActive: {
@@ -982,7 +1000,7 @@ const mobileStyles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   titleText: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: "600",
     color: "#111827",
     lineHeight: 22,
@@ -995,7 +1013,7 @@ const mobileStyles = StyleSheet.create({
     flexWrap: "wrap",
   },
   mobileDetailText: {
-    fontSize: 13,
+    fontSize: 11,
     color: "#6b7280",
   },
   actionsCellMobile: {

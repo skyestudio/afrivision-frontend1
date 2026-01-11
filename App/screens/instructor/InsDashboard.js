@@ -12,6 +12,7 @@ import { BarChart, PieChart, LineChart } from "react-native-chart-kit";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InsTopNav from "../../components/InsTopNav";
 import { Ionicons } from "@expo/vector-icons";
+import InsBottomNav from "../../components/InsBottomNav";
 
 const stats = [
   { label: "Total Students", value: "450", change: "5% increase" },
@@ -118,8 +119,12 @@ export default function InsDashboard() {
   return (
     <View style={styles.mainContainer}>
       <SafeAreaView style={styles.safeArea}>
-        <InsTopNav activeNav={"Dashboard"} />
-        <View style={styles.spacer}></View>
+        {!isMobile && (
+          <>
+            <InsTopNav activeNav="Dashboard" />
+            <View style={styles.spacer} />
+          </>
+        )}
 
         <ScrollView
           style={styles.scrollView}
@@ -233,6 +238,11 @@ export default function InsDashboard() {
           {/* Extra space at bottom for better scrolling */}
           <View style={styles.bottomSpacer} />
         </ScrollView>
+        {isMobile && (
+          <>
+            <InsBottomNav activeNav="Dashboard" />
+          </>
+        )}
       </SafeAreaView>
     </View>
   );

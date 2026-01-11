@@ -11,47 +11,39 @@ import {
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import InsTopNav from "../../components/InsTopNav";
+import InsBottomNav from "../../components/InsBottomNav";
 
 export default function InsAccountSettingsScreen() {
   const [activeTab, setActiveTab] = useState("account");
-
-  const { width } = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
 
   const isMobile = width < 768;
   const isTablet = width >= 768 && width < 1024;
-  const isDesktop = width >= 1024;
+
+  // Choose appropriate styles based on screen size
+  const styles = isMobile
+    ? mobileStyles
+    : isTablet
+    ? tabletStyles
+    : desktopStyles;
 
   const renderContent = () => {
     switch (activeTab) {
       case "account":
         return (
           <ScrollView
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
             contentContainerStyle={styles.scrollContent}>
             <View style={styles.card}>
               <Text style={styles.sectionTitle}>Profile Information</Text>
 
-              <View
-                style={[
-                  styles.rowContainer,
-                  isMobile && styles.columnContainer,
-                ]}>
-                <View
-                  style={[
-                    styles.inputGroup,
-                    isMobile && styles.fullWidthInput,
-                    !isMobile && styles.halfWidthInput,
-                  ]}>
+              <View style={styles.rowContainer}>
+                <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Name</Text>
                   <TextInput placeholder="John Doe" style={styles.input} />
                 </View>
 
-                <View
-                  style={[
-                    styles.inputGroup,
-                    isMobile && styles.fullWidthInput,
-                    !isMobile && styles.halfWidthInput,
-                  ]}>
+                <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Email</Text>
                   <TextInput
                     placeholder="john@example.com"
@@ -61,27 +53,13 @@ export default function InsAccountSettingsScreen() {
                 </View>
               </View>
 
-              <View
-                style={[
-                  styles.rowContainer,
-                  isMobile && styles.columnContainer,
-                ]}>
-                <View
-                  style={[
-                    styles.inputGroup,
-                    isMobile && styles.fullWidthInput,
-                    !isMobile && styles.halfWidthInput,
-                  ]}>
+              <View style={styles.rowContainer}>
+                <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Location</Text>
                   <TextInput placeholder="City, Country" style={styles.input} />
                 </View>
 
-                <View
-                  style={[
-                    styles.inputGroup,
-                    isMobile && styles.fullWidthInput,
-                    !isMobile && styles.halfWidthInput,
-                  ]}>
+                <View style={styles.inputGroup}>
                   <Text style={styles.inputLabel}>Phone Number</Text>
                   <TextInput
                     placeholder="+1 234 567 8900"
@@ -101,8 +79,7 @@ export default function InsAccountSettingsScreen() {
                 />
               </View>
 
-              <TouchableOpacity
-                style={[styles.saveBtn, isMobile && styles.saveBtnMobile]}>
+              <TouchableOpacity style={styles.saveBtn}>
                 <Text style={styles.saveText}>Save Changes</Text>
               </TouchableOpacity>
             </View>
@@ -146,43 +123,44 @@ export default function InsAccountSettingsScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <InsTopNav activeNav={"IncMyStudentsScreen"} />
-      <View style={styles.headerSpacer} />
-
+      {!isMobile && (
+        <>
+          <InsTopNav activeNav="IncMyStudentsScreen" />
+          <View style={styles.spacer} />
+        </>
+      )}
       {/* Main Content */}
-      <View style={[styles.mainContent, isMobile && styles.mainContentMobile]}>
+      <View style={styles.layout}>
         {/* Sidebar - Hidden on mobile, shown as bottom tab or drawer */}
         {!isMobile ? (
-          <View
-            style={[
-              styles.sidebar,
-              isTablet && styles.sidebarTablet,
-              isDesktop && styles.sidebarDesktop,
-            ]}>
+          <View style={styles.sidebar}>
             <SidebarItem
               icon="person-outline"
               label="Account Settings"
               active={activeTab === "account"}
               onPress={() => setActiveTab("account")}
+              isMobile={false}
             />
             <SidebarItem
               icon="notifications-outline"
               label="Notification Settings"
               active={activeTab === "notifications"}
               onPress={() => setActiveTab("notifications")}
+              isMobile={false}
             />
             <SidebarItem
               icon="lock-closed-outline"
               label="Security & Privacy"
               active={activeTab === "security"}
               onPress={() => setActiveTab("security")}
+              isMobile={false}
             />
             <SidebarItem
               icon="school-outline"
               label="Teaching Settings"
               active={activeTab === "teaching"}
               onPress={() => setActiveTab("teaching")}
+              isMobile={false}
             />
 
             <View style={styles.divider} />
@@ -192,114 +170,98 @@ export default function InsAccountSettingsScreen() {
               label="Logout"
               danger
               onPress={() => console.log("Logout pressed")}
+              isMobile={false}
             />
           </View>
         ) : (
           // Mobile sidebar as horizontal tab bar
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.mobileTabBar}
-            contentContainerStyle={styles.mobileTabBarContent}>
-            <TouchableOpacity
-              onPress={() => setActiveTab("account")}
-              style={[
-                styles.mobileTabItem,
-                activeTab === "account" && styles.mobileTabItemActive,
-              ]}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color={activeTab === "account" ? "#fff" : "#6b7280"}
+          <View style={styles.mobileTabBarContainer}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              style={styles.mobileTabBar}
+              contentContainerStyle={styles.mobileTabBarContent}>
+              <SidebarItem
+                icon="person-outline"
+                label="Account"
+                active={activeTab === "account"}
+                onPress={() => setActiveTab("account")}
+                isMobile={true}
               />
-              <Text
-                style={[
-                  styles.mobileTabText,
-                  activeTab === "account" && styles.mobileTabTextActive,
-                ]}>
-                Account
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab("notifications")}
-              style={[
-                styles.mobileTabItem,
-                activeTab === "notifications" && styles.mobileTabItemActive,
-              ]}>
-              <Ionicons
-                name="notifications-outline"
-                size={20}
-                color={activeTab === "notifications" ? "#fff" : "#6b7280"}
+              <SidebarItem
+                icon="notifications-outline"
+                label="Notifications"
+                active={activeTab === "notifications"}
+                onPress={() => setActiveTab("notifications")}
+                isMobile={true}
               />
-              <Text
-                style={[
-                  styles.mobileTabText,
-                  activeTab === "notifications" && styles.mobileTabTextActive,
-                ]}>
-                Notifications
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab("security")}
-              style={[
-                styles.mobileTabItem,
-                activeTab === "security" && styles.mobileTabItemActive,
-              ]}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color={activeTab === "security" ? "#fff" : "#6b7280"}
+              <SidebarItem
+                icon="lock-closed-outline"
+                label="Security"
+                active={activeTab === "security"}
+                onPress={() => setActiveTab("security")}
+                isMobile={true}
               />
-              <Text
-                style={[
-                  styles.mobileTabText,
-                  activeTab === "security" && styles.mobileTabTextActive,
-                ]}>
-                Security
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setActiveTab("teaching")}
-              style={[
-                styles.mobileTabItem,
-                activeTab === "teaching" && styles.mobileTabItemActive,
-              ]}>
-              <Ionicons
-                name="school-outline"
-                size={20}
-                color={activeTab === "teaching" ? "#fff" : "#6b7280"}
+              <SidebarItem
+                icon="school-outline"
+                label="Teaching"
+                active={activeTab === "teaching"}
+                onPress={() => setActiveTab("teaching")}
+                isMobile={true}
               />
-              <Text
-                style={[
-                  styles.mobileTabText,
-                  activeTab === "teaching" && styles.mobileTabTextActive,
-                ]}>
-                Teaching
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => console.log("Logout pressed")}
-              style={styles.mobileTabItemDanger}>
-              <Ionicons name="log-out-outline" size={20} color="#ef4444" />
-              <Text style={styles.mobileTabTextDanger}>Logout</Text>
-            </TouchableOpacity>
-          </ScrollView>
+              <SidebarItem
+                icon="log-out-outline"
+                label="Logout"
+                danger
+                onPress={() => console.log("Logout pressed")}
+                isMobile={true}
+              />
+            </ScrollView>
+          </View>
         )}
 
         {/* Content */}
-        <View style={[styles.content, isMobile && styles.contentMobile]}>
-          {renderContent()}
-        </View>
+        <View style={styles.content}>{renderContent()}</View>
       </View>
+      {isMobile && (
+        <>
+          <InsBottomNav activeNav="Dashboard" />
+        </>
+      )}
     </SafeAreaView>
   );
 }
 
-function SidebarItem({ icon, label, active, danger, onPress }) {
+function SidebarItem({ icon, label, active, danger, onPress, isMobile }) {
+  const styles = isMobile ? mobileStyles : desktopStyles;
+
+  if (isMobile) {
+    return (
+      <TouchableOpacity
+        onPress={onPress}
+        style={[
+          styles.mobileTabItem,
+          active && styles.mobileTabItemActive,
+          danger && styles.mobileTabItemDanger,
+        ]}>
+        <Ionicons
+          name={icon}
+          size={20}
+          color={danger ? "#ef4444" : active ? "#fff" : "#6b7280"}
+        />
+        <Text
+          style={[
+            styles.mobileTabText,
+            active && styles.mobileTabTextActive,
+            danger && styles.mobileTabTextDanger,
+          ]}
+          numberOfLines={1}>
+          {label}
+        </Text>
+      </TouchableOpacity>
+    );
+  }
+
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -325,52 +287,40 @@ function SidebarItem({ icon, label, active, danger, onPress }) {
   );
 }
 
-const styles = StyleSheet.create({
+// DESKTOP STYLES (≥ 1024px)
+const desktopStyles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#f9fafb",
   },
-  headerSpacer: {
-    width: "100%",
-    height: 90,
+  spacer: {
+    height: 70,
   },
-  mainContent: {
+  layout: {
     flex: 1,
     flexDirection: "row",
-    width: "90%",
-    alignSelf: "center",
-  },
-  mainContentMobile: {
-    flexDirection: "column",
+    maxWidth: 1400,
     width: "100%",
-    paddingHorizontal: 16,
+    alignSelf: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 20,
   },
   sidebar: {
-    backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginRight: 20,
-  },
-  sidebarDesktop: {
     width: 280,
-  },
-  sidebarTablet: {
-    width: 240,
-  },
-  sidebarTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: "#111827",
-    marginBottom: 20,
-    paddingLeft: 8,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    height: "100%",
   },
   sidebarItem: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
-    borderRadius: 12,
+    borderRadius: 10,
     marginBottom: 4,
   },
   sidebarItemActive: {
@@ -394,47 +344,263 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: "#e5e7eb",
-    marginVertical: 12,
+    marginVertical: 16,
   },
-  mobileTabBar: {
-    flexGrow: 0,
-    marginBottom: 16,
+  content: {
+    flex: 1,
+    marginLeft: 24,
+  },
+  card: {
     backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    padding: 24,
+    minHeight: 500,
+  },
+  scrollContent: {
+    paddingBottom: 24,
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 24,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 20,
+    marginBottom: 20,
+  },
+  inputGroup: {
+    flex: 1,
+    marginBottom: 16,
+  },
+  fullWidthInput: {
+    flex: 2,
+  },
+  inputLabel: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    backgroundColor: "#fff",
+    fontSize: 14,
+  },
+  textArea: {
+    height: 100,
+    textAlignVertical: "top",
+    paddingTop: 12,
+  },
+  saveBtn: {
+    backgroundColor: "#f97316",
+    paddingHorizontal: 24,
+    paddingVertical: 14,
+    borderRadius: 8,
+    marginTop: 8,
+    alignSelf: "flex-start",
+  },
+  saveText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  comingSoon: {
+    fontSize: 16,
+    color: "#6b7280",
+    textAlign: "center",
+    marginTop: 40,
+  },
+});
+
+// TABLET STYLES (768px - 1023px)
+const tabletStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f9fafb",
+  },
+  spacer: {
+    height: 70,
+  },
+  layout: {
+    flex: 1,
+    flexDirection: "row",
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  sidebar: {
+    width: 240,
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  sidebarItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    marginBottom: 4,
+  },
+  sidebarItemActive: {
+    backgroundColor: "#f97316",
+  },
+  sidebarItemDanger: {
+    marginTop: 8,
+  },
+  sidebarText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#374151",
+  },
+  sidebarTextActive: {
+    color: "#fff",
+    fontWeight: "600",
+  },
+  sidebarTextDanger: {
+    color: "#ef4444",
+  },
+  divider: {
+    height: 1,
+    backgroundColor: "#e5e7eb",
+    marginVertical: 14,
+  },
+  content: {
+    flex: 1,
+    marginLeft: 20,
+  },
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    padding: 20,
+    minHeight: 400,
+  },
+  scrollContent: {
+    paddingBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#111827",
+    marginBottom: 20,
+  },
+  rowContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 16,
+    marginBottom: 16,
+  },
+  inputGroup: {
+    flex: 1,
+    marginBottom: 14,
+  },
+  fullWidthInput: {
+    flex: 2,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: "#374151",
+    marginBottom: 6,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: "#fff",
+    fontSize: 13,
+  },
+  textArea: {
+    height: 90,
+    textAlignVertical: "top",
+    paddingTop: 10,
+  },
+  saveBtn: {
+    backgroundColor: "#f97316",
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 8,
+    alignSelf: "flex-start",
+  },
+  saveText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  comingSoon: {
+    fontSize: 15,
+    color: "#6b7280",
+    textAlign: "center",
+    marginTop: 36,
+  },
+});
+
+// MOBILE STYLES (< 768px)
+const mobileStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f9fafb",
+  },
+  layout: {
+    // flex: 1,
+    flexDirection: "column",
+    //  backgroundColor: "red",
+    paddingTop: 0,
+  },
+  mobileTabBarContainer: {
+    backgroundColor: "#fff",
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
     paddingVertical: 8,
   },
+  mobileTabBar: {
+    height: 48,
+  },
   mobileTabBarContent: {
-    paddingHorizontal: 16,
     alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
   },
   mobileTabItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginRight: 12,
+    gap: 6,
+    paddingVertical: 8,
+    paddingHorizontal: 14,
+    borderRadius: 20,
     borderWidth: 1,
     borderColor: "#e5e7eb",
     backgroundColor: "#f9fafb",
+    minWidth: 90,
+    justifyContent: "center",
   },
   mobileTabItemActive: {
     backgroundColor: "#f97316",
     borderColor: "#f97316",
   },
   mobileTabItemDanger: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 12,
-    marginRight: 12,
-    borderWidth: 1,
     borderColor: "#ef4444",
+    backgroundColor: "#fff",
   },
   mobileTabText: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: "500",
     color: "#374151",
   },
@@ -443,94 +609,83 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   mobileTabTextDanger: {
-    fontSize: 14,
-    fontWeight: "500",
     color: "#ef4444",
   },
   content: {
-    flex: 1,
-  },
-  contentMobile: {
-    width: "100%",
+    // flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
   },
   card: {
     backgroundColor: "#fff",
-    borderRadius: 16,
-    padding: 24,
-    minHeight: 400,
+    borderRadius: 12,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    paddingBottom: 10,
+    height: "100%",
   },
   scrollContent: {
-    flexGrow: 1,
+    paddingBottom: 16,
+    flex: 0.9,
+    // height: 1,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 14,
     fontWeight: "700",
     color: "#111827",
-    marginBottom: 24,
+    marginBottom: 10,
   },
   rowContainer: {
-    width: "100%",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  columnContainer: {
     flexDirection: "column",
-    justifyContent: "flex-start",
+    gap: 2,
+    marginBottom: 12,
   },
   inputGroup: {
-    marginBottom: 16,
-  },
-  halfWidthInput: {
-    width: "48%",
+    width: "100%",
+    marginBottom: 12,
   },
   fullWidthInput: {
     width: "100%",
   },
   inputLabel: {
-    fontSize: 14,
-    fontWeight: "500",
+    fontSize: 12,
+    fontWeight: "600",
     color: "#374151",
-    marginBottom: 8,
+    marginBottom: 6,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#e5e7eb",
-    borderRadius: 10,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    fontSize: 15,
-    color: "#111827",
-    backgroundColor: "#f9fafb",
+    borderColor: "#d1d5db",
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    backgroundColor: "#fff",
+    fontSize: 13,
   },
   textArea: {
-    height: 100,
+    height: 50,
     textAlignVertical: "top",
+    paddingTop: 10,
   },
   saveBtn: {
     backgroundColor: "#f97316",
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 10,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
     marginTop: 8,
-    alignItems: "center",
-    width: "15%",
-    alignSelf: "flex-start",
-  },
-  saveBtnMobile: {
-    width: "100%",
     alignSelf: "stretch",
+    alignItems: "center",
   },
   saveText: {
     color: "#fff",
     fontWeight: "600",
-    fontSize: 12,
-    textAlign: "center",
+    fontSize: 13,
   },
   comingSoon: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#6b7280",
     textAlign: "center",
-    marginTop: 20,
+    marginTop: 32,
   },
 });

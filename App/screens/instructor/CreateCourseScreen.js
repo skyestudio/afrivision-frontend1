@@ -12,6 +12,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Feather } from "@expo/vector-icons";
 import InsTopNav from "../../components/InsTopNav";
+import InsBottomNav from "../../components/InsBottomNav";
 
 const STEPS = [
   {
@@ -858,8 +859,12 @@ export default function CreateCourseScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <InsTopNav activeNav={"Dashboard"} />
-      <View style={styles.spacer}></View>
+      {!isMobile && (
+        <>
+          <InsTopNav activeNav="Dashboard" />
+          <View style={styles.spacer} />
+        </>
+      )}
 
       <View style={styles.layout}>
         {/* LEFT: Steps Sidebar */}
@@ -900,6 +905,11 @@ export default function CreateCourseScreen() {
         isMobile={isMobile}
         isTablet={isTablet}
       />
+      {isMobile && (
+        <>
+          <InsBottomNav activeNav="Dashboard" />
+        </>
+      )}
     </SafeAreaView>
   );
 }
