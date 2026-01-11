@@ -5,9 +5,11 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  useWindowDimensions,
 } from "react-native";
 import Checkbox from "expo-checkbox";
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "@react-navigation/native";
 import InsTopNav from "../../components/InsTopNav";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -86,6 +88,19 @@ const coursesData = [
 export default function IncMyCoursesScreen() {
   const [filter, setFilter] = useState("All");
   const [selected, setSelected] = useState([]);
+  const { width } = useWindowDimensions();
+  const isMobile = width < 768;
+  const isTablet = width >= 768 && width < 1024;
+  const isDesktop = width >= 1024;
+
+  const navigation = useNavigation();
+
+  // Choose the appropriate styles based on screen size
+  const styles = isMobile
+    ? mobileStyles
+    : isTablet
+    ? tabletStyles
+    : desktopStyles;
 
   const filteredCourses = useMemo(() => {
     if (filter === "All") return coursesData;
@@ -124,162 +139,251 @@ export default function IncMyCoursesScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <InsTopNav activeNav={"Dashboard"} />
-      <View style={{ width: "100%", height: 70 }}></View>
+    <View style={styles.mainContainer}>
+      <SafeAreaView style={styles.safeArea}>
+        <InsTopNav activeNav={"IncMyCoursesScreen"} />
+        <View style={styles.spacer}></View>
 
-      <View style={styles.innerContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.heading}>My Courses</Text>
+        <View style={styles.innerContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <Text style={styles.heading}>My Courses</Text>
 
-          <View style={styles.headerButtons}>
-            <TouchableOpacity style={styles.sortBtn}>
-              <Text style={styles.sortText}>Sort By</Text>
-              <Feather name="chevron-down" size={16} color="#374151" />
-            </TouchableOpacity>
+            <View style={styles.headerButtons}>
+              {!isMobile && (
+                <TouchableOpacity style={styles.sortBtn}>
+                  <Text style={styles.sortText}>Sort By</Text>
+                  <Feather name="chevron-down" size={16} color="#374151" />
+                </TouchableOpacity>
+              )}
 
-            <TouchableOpacity style={styles.createBtn}>
-              <Text style={styles.createText}>+ Create New Course</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        {/* Filters */}
-        <View style={styles.filters}>
-          {["All", "Published", "Draft", "Archived"].map((item) => (
-            <TouchableOpacity
-              key={item}
-              style={[styles.filterBtn, filter === item && styles.filterActive]}
-              onPress={() => {
-                setFilter(item);
-                setSelected([]);
-              }}>
-              <Text
-                style={[
-                  styles.filterText,
-                  filter === item && styles.filterTextActive,
-                ]}>
-                {item}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-
-        {/* Table Header */}
-        <View style={styles.tableHeader}>
-          <View style={styles.checkboxCell}>
-            <Checkbox value={allSelected} onValueChange={toggleSelectAll} />
-          </View>
-          <View style={[styles.headerCell, styles.titleCell]}>
-            <Text style={styles.headerText}>Course Title</Text>
-          </View>
-          <View style={[styles.headerCell, styles.statusCell]}>
-            <Text style={styles.headerText}>Status</Text>
-          </View>
-          <View style={[styles.headerCell, styles.numberCell]}>
-            <Text style={styles.headerText}>Enrollments</Text>
-          </View>
-          <View style={[styles.headerCell, styles.numberCell]}>
-            <Text style={styles.headerText}>Completion Rate</Text>
-          </View>
-          <View style={[styles.headerCell, styles.dateCell]}>
-            <Text style={styles.headerText}>Last Updated</Text>
-          </View>
-          <View style={[styles.headerCell, styles.actionsCell]}>
-            <Text style={styles.headerText}>Actions</Text>
-          </View>
-        </View>
-
-        {/* Table Body - Using ScrollView */}
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={styles.scrollViewContent}
-          showsVerticalScrollIndicator={false}>
-          {filteredCourses.map((item) => (
-            <View key={item.id} style={styles.row}>
-              <View style={styles.checkboxCell}>
-                <Checkbox
-                  value={selected.includes(item.id)}
-                  onValueChange={() => toggleSelectRow(item.id)}
-                  style={styles.checkbox}
-                />
-              </View>
-
-              <View style={[styles.cell, styles.titleCell]}>
-                <Text style={styles.titleText} numberOfLines={2}>
-                  {item.title}
+              <TouchableOpacity
+                style={styles.createBtn}
+                onPress={() => {
+                  navigation.navigate("CreateCourseScreen");
+                }}>
+                <Text style={styles.createText}>
+                  {isMobile ? "+ Create" : "+ Create New Course"}
                 </Text>
-              </View>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-              <View style={[styles.cell, styles.statusCell]}>
-                {renderBadge(item.status)}
-              </View>
-
-              <View style={[styles.cell, styles.numberCell]}>
-                <Text style={styles.cellText}>{item.enrollments ?? "-"}</Text>
-              </View>
-
-              <View style={[styles.cell, styles.numberCell]}>
-                <Text style={styles.cellText}>{item.completion ?? "-"}</Text>
-              </View>
-
-              <View style={[styles.cell, styles.dateCell]}>
-                <Text style={styles.cellText}>{item.updated ?? "-"}</Text>
-              </View>
-
-              <View style={[styles.cell, styles.actionsCell]}>
-                <View style={styles.actionsContainer}>
-                  <TouchableOpacity style={styles.actionBtn}>
-                    <Feather name="edit" size={16} color="#2563eb" />
+          {/* Filters - Horizontal scroll on mobile */}
+          <View style={styles.filtersContainer}>
+            <ScrollView
+              horizontal={isMobile}
+              showsHorizontalScrollIndicator={false}
+              style={styles.filtersScroll}
+              contentContainerStyle={styles.filtersScrollContent}>
+              <View style={styles.filters}>
+                {["All", "Published", "Draft", "Archived"].map((item) => (
+                  <TouchableOpacity
+                    key={item}
+                    style={[
+                      styles.filterBtn,
+                      filter === item && styles.filterActive,
+                    ]}
+                    onPress={() => {
+                      setFilter(item);
+                      setSelected([]);
+                    }}>
+                    <Text
+                      style={[
+                        styles.filterText,
+                        filter === item && styles.filterTextActive,
+                      ]}>
+                      {item}
+                    </Text>
                   </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionBtn}>
-                    <Feather name="trash" size={16} color="#ef4444" />
-                  </TouchableOpacity>
-                  <TouchableOpacity style={styles.actionBtn}>
-                    <Feather name="external-link" size={16} color="#6b7280" />
-                  </TouchableOpacity>
-                </View>
+                ))}
+              </View>
+            </ScrollView>
+          </View>
+
+          {/* Table Header - Hide some columns on mobile */}
+          {!isMobile ? (
+            <View style={styles.tableHeader}>
+              <View style={styles.checkboxCell}>
+                <Checkbox value={allSelected} onValueChange={toggleSelectAll} />
+              </View>
+              <View style={[styles.headerCell, styles.titleCell]}>
+                <Text style={styles.headerText}>Course Title</Text>
+              </View>
+              <View style={[styles.headerCell, styles.statusCell]}>
+                <Text style={styles.headerText}>Status</Text>
+              </View>
+              <View style={[styles.headerCell, styles.numberCell]}>
+                <Text style={styles.headerText}>Enrollments</Text>
+              </View>
+              <View style={[styles.headerCell, styles.numberCell]}>
+                <Text style={styles.headerText}>Completion</Text>
+              </View>
+              <View style={[styles.headerCell, styles.dateCell]}>
+                <Text style={styles.headerText}>Last Updated</Text>
+              </View>
+              <View style={[styles.headerCell, styles.actionsCell]}>
+                <Text style={styles.headerText}>Actions</Text>
               </View>
             </View>
-          ))}
-        </ScrollView>
+          ) : (
+            <View style={styles.tableHeaderMobile}>
+              <View style={styles.checkboxCellMobile}>
+                <Checkbox value={allSelected} onValueChange={toggleSelectAll} />
+              </View>
+              <View style={styles.titleCellMobile}>
+                <Text style={styles.headerText}>Course Title</Text>
+              </View>
+              <View style={styles.actionsCellMobile}>
+                <Text style={styles.headerText}>Actions</Text>
+              </View>
+            </View>
+          )}
 
-        {/* Selection Info */}
-        {selected.length > 0 && (
-          <View style={styles.selectionInfo}>
-            <Text style={styles.selectionText}>
-              {selected.length} course{selected.length !== 1 ? "s" : ""}{" "}
-              selected
-            </Text>
-            <TouchableOpacity onPress={() => setSelected([])}>
-              <Text style={styles.clearText}>Clear</Text>
-            </TouchableOpacity>
-          </View>
-        )}
+          {/* Table Body */}
+          <ScrollView
+            style={styles.scrollView}
+            contentContainerStyle={styles.scrollViewContent}
+            showsVerticalScrollIndicator={true}>
+            {filteredCourses.map((item) =>
+              !isMobile ? (
+                // Desktop/Tablet Row
+                <View key={item.id} style={styles.row}>
+                  <View style={styles.checkboxCell}>
+                    <Checkbox
+                      value={selected.includes(item.id)}
+                      onValueChange={() => toggleSelectRow(item.id)}
+                      style={styles.checkbox}
+                    />
+                  </View>
 
-        {/* Pagination */}
-        <View style={styles.pagination}>
-          <TouchableOpacity style={styles.nextBtn}>
-            <Text style={styles.nextText}>Next</Text>
-            <Feather name="arrow-right" size={16} color="#111827" />
-          </TouchableOpacity>
+                  <View style={[styles.cell, styles.titleCell]}>
+                    <Text style={styles.titleText} numberOfLines={2}>
+                      {item.title}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.cell, styles.statusCell]}>
+                    {renderBadge(item.status)}
+                  </View>
+
+                  <View style={[styles.cell, styles.numberCell]}>
+                    <Text style={styles.cellText}>
+                      {item.enrollments ?? "-"}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.cell, styles.numberCell]}>
+                    <Text style={styles.cellText}>
+                      {item.completion ?? "-"}
+                    </Text>
+                  </View>
+
+                  <View style={[styles.cell, styles.dateCell]}>
+                    <Text style={styles.cellText}>{item.updated ?? "-"}</Text>
+                  </View>
+
+                  <View style={[styles.cell, styles.actionsCell]}>
+                    <View style={styles.actionsContainer}>
+                      <TouchableOpacity style={styles.actionBtn}>
+                        <Feather name="edit" size={16} color="#2563eb" />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.actionBtn}>
+                        <Feather name="trash" size={16} color="#ef4444" />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.actionBtn}>
+                        <Feather
+                          name="external-link"
+                          size={16}
+                          color="#6b7280"
+                        />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              ) : (
+                // Mobile Row
+                <View key={item.id} style={styles.rowMobile}>
+                  <View style={styles.checkboxCellMobile}>
+                    <Checkbox
+                      value={selected.includes(item.id)}
+                      onValueChange={() => toggleSelectRow(item.id)}
+                      style={styles.checkbox}
+                    />
+                  </View>
+
+                  <View style={styles.titleCellMobile}>
+                    <Text style={styles.titleText} numberOfLines={2}>
+                      {item.title}
+                    </Text>
+                    <View style={styles.mobileRowDetails}>
+                      {renderBadge(item.status)}
+                      <Text style={styles.mobileDetailText}>
+                        {item.enrollments
+                          ? `${item.enrollments} enrolled`
+                          : "Not published"}
+                      </Text>
+                    </View>
+                  </View>
+
+                  <View style={styles.actionsCellMobile}>
+                    <View style={styles.actionsContainer}>
+                      <TouchableOpacity style={styles.actionBtn}>
+                        <Feather name="edit" size={16} color="#2563eb" />
+                      </TouchableOpacity>
+                      <TouchableOpacity style={styles.actionBtn}>
+                        <Feather name="trash" size={16} color="#ef4444" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              )
+            )}
+          </ScrollView>
+
+          {/* Selection Info */}
+          {selected.length > 0 && (
+            <View style={styles.selectionInfo}>
+              <Text style={styles.selectionText}>
+                {selected.length} course{selected.length !== 1 ? "s" : ""}{" "}
+                selected
+              </Text>
+              <TouchableOpacity onPress={() => setSelected([])}>
+                <Text style={styles.clearText}>Clear</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
+          {/* Pagination */}
+          {!isMobile && (
+            <View style={styles.pagination}>
+              <TouchableOpacity style={styles.nextBtn}>
+                <Text style={styles.nextText}>Next</Text>
+                <Feather name="arrow-right" size={16} color="#111827" />
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
+// DESKTOP STYLES (≥ 1024px)
+const desktopStyles = StyleSheet.create({
+  mainContainer: {
     flex: 1,
     backgroundColor: "#fff",
   },
+  safeArea: {
+    flex: 1,
+  },
+  spacer: {
+    height: 70,
+  },
   innerContainer: {
     flex: 1,
-    paddingHorizontal: 16,
-    width: "90%",
-    alignSelf: "center",
+    paddingHorizontal: 20,
   },
   header: {
     flexDirection: "row",
@@ -294,12 +398,12 @@ const styles = StyleSheet.create({
   },
   headerButtons: {
     flexDirection: "row",
-    gap: 10,
+    gap: 12,
     alignItems: "center",
   },
   createBtn: {
     backgroundColor: "#f97316",
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
@@ -313,7 +417,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     backgroundColor: "#f3f4f6",
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     paddingVertical: 10,
     borderRadius: 8,
     borderWidth: 1,
@@ -324,10 +428,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#374151",
   },
+  filtersContainer: {
+    marginBottom: 16,
+  },
+  filtersScroll: {
+    // Empty - let content define size
+  },
+  filtersScrollContent: {
+    // Empty - let content define size
+  },
   filters: {
     flexDirection: "row",
-    flexWrap: "wrap",
-    marginBottom: 16,
     gap: 8,
   },
   filterBtn: {
@@ -367,13 +478,10 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   scrollView: {
-    // flex: 1,
-    width: "100%",
-    height: 1,
-    // backgroundColor: "red",
+    flex: 1,
   },
   scrollViewContent: {
-    paddingBottom: 100, // Extra padding for selection info and pagination
+    paddingBottom: 100,
   },
   row: {
     flexDirection: "row",
@@ -449,8 +557,8 @@ const styles = StyleSheet.create({
   selectionInfo: {
     position: "absolute",
     bottom: 60,
-    left: 0,
-    right: 0,
+    left: 20,
+    right: 20,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -461,8 +569,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#93c5fd",
     zIndex: 10,
-    width: "100%",
-    alignSelf: "center",
   },
   selectionText: {
     color: "#1e40af",
@@ -477,7 +583,7 @@ const styles = StyleSheet.create({
   pagination: {
     position: "absolute",
     bottom: 16,
-    right: 1,
+    right: 20,
     zIndex: 10,
   },
   nextBtn: {
@@ -496,4 +602,451 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#111827",
   },
+});
+
+// TABLET STYLES (768px - 1023px)
+const tabletStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  spacer: {
+    height: 70,
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 24,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  heading: {
+    fontSize: 26,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  headerButtons: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+  createBtn: {
+    backgroundColor: "#f97316",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  createText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  sortBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  sortText: {
+    fontWeight: "500",
+    fontSize: 13,
+    color: "#374151",
+  },
+  filtersContainer: {
+    marginBottom: 16,
+  },
+  filtersScroll: {
+    // Empty
+  },
+  filtersScrollContent: {
+    // Empty
+  },
+  filters: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  filterBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#f3f4f6",
+  },
+  filterActive: {
+    backgroundColor: "#111827",
+  },
+  filterText: {
+    color: "#6b7280",
+    fontWeight: "500",
+    fontSize: 13,
+  },
+  filterTextActive: {
+    color: "#fff",
+  },
+  tableHeader: {
+    flexDirection: "row",
+    backgroundColor: "#f9fafb",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    alignItems: "center",
+  },
+  headerCell: {
+    justifyContent: "center",
+  },
+  headerText: {
+    fontWeight: "600",
+    fontSize: 11,
+    color: "#374151",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  scrollViewContent: {
+    paddingBottom: 100,
+  },
+  row: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    paddingVertical: 12,
+    paddingHorizontal: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+    alignItems: "center",
+    minHeight: 60,
+  },
+  cell: {
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  checkboxCell: {
+    width: 40,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  checkbox: {
+    margin: 0,
+  },
+  titleCell: {
+    flex: 2.5,
+  },
+  titleText: {
+    fontSize: 14,
+    fontWeight: "500",
+    color: "#111827",
+    lineHeight: 20,
+  },
+  statusCell: {
+    flex: 1.2,
+    alignItems: "flex-start",
+  },
+  badge: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: "flex-start",
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  numberCell: {
+    flex: 1,
+    alignItems: "center",
+  },
+  dateCell: {
+    flex: 1.5,
+    alignItems: "flex-start",
+  },
+  actionsCell: {
+    flex: 1.2,
+    alignItems: "center",
+  },
+  cellText: {
+    fontSize: 13,
+    color: "#374151",
+    lineHeight: 20,
+  },
+  actionsContainer: {
+    flexDirection: "row",
+    gap: 10,
+    alignItems: "center",
+  },
+  actionBtn: {
+    padding: 4,
+  },
+  selectionInfo: {
+    position: "absolute",
+    bottom: 60,
+    left: 24,
+    right: 24,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#dbeafe",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#93c5fd",
+    zIndex: 10,
+  },
+  selectionText: {
+    color: "#1e40af",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  clearText: {
+    color: "#dc2626",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  pagination: {
+    position: "absolute",
+    bottom: 16,
+    right: 24,
+    zIndex: 10,
+  },
+  nextBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  nextText: {
+    fontWeight: "600",
+    fontSize: 14,
+    color: "#111827",
+  },
+});
+
+// MOBILE STYLES (< 768px)
+const mobileStyles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  safeArea: {
+    flex: 1,
+  },
+  spacer: {
+    height: 75,
+  },
+  innerContainer: {
+    flex: 1,
+    paddingHorizontal: 16,
+  },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  heading: {
+    fontSize: 24,
+    fontWeight: "700",
+    color: "#111827",
+  },
+  headerButtons: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  createBtn: {
+    backgroundColor: "#f97316",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  createText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  sortBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+  },
+  sortText: {
+    fontWeight: "500",
+    fontSize: 12,
+    color: "#374151",
+  },
+  // FIXED: Filters section with fixed height container
+  filtersContainer: {
+    height: 48,
+    marginBottom: 16,
+  },
+  filtersScroll: {
+    height: 48,
+  },
+  filtersScrollContent: {
+    alignItems: "center",
+    paddingVertical: 4,
+  },
+  filters: {
+    flexDirection: "row",
+    gap: 8,
+    height: 40,
+    alignItems: "center",
+  },
+  filterBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    borderRadius: 20,
+    backgroundColor: "#f3f4f6",
+    justifyContent: "center",
+  },
+  filterActive: {
+    backgroundColor: "#111827",
+  },
+  filterText: {
+    color: "#6b7280",
+    fontWeight: "500",
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  filterTextActive: {
+    color: "#fff",
+  },
+  tableHeaderMobile: {
+    flexDirection: "row",
+    backgroundColor: "#f9fafb",
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  headerText: {
+    fontWeight: "600",
+    fontSize: 12,
+    color: "#374151",
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  scrollView: {
+    // flex: 1,
+    height: 1,
+  },
+  scrollViewContent: {
+    paddingBottom: 100,
+  },
+  rowMobile: {
+    flexDirection: "row",
+    backgroundColor: "#fff",
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+    alignItems: "flex-start",
+  },
+  checkboxCellMobile: {
+    width: 40,
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 4,
+  },
+  checkbox: {
+    margin: 0,
+  },
+  titleCellMobile: {
+    flex: 1,
+    paddingHorizontal: 8,
+  },
+  titleText: {
+    fontSize: 15,
+    fontWeight: "600",
+    color: "#111827",
+    lineHeight: 22,
+    marginBottom: 8,
+  },
+  mobileRowDetails: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flexWrap: "wrap",
+  },
+  mobileDetailText: {
+    fontSize: 13,
+    color: "#6b7280",
+  },
+  actionsCellMobile: {
+    width: 60,
+    alignItems: "flex-end",
+    justifyContent: "flex-start",
+    paddingTop: 4,
+  },
+  badge: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  badgeText: {
+    color: "#fff",
+    fontSize: 11,
+    fontWeight: "600",
+  },
+  actionsContainer: {
+    flexDirection: "column",
+    gap: 12,
+    alignItems: "center",
+  },
+  actionBtn: {
+    padding: 4,
+  },
+  selectionInfo: {
+    position: "absolute",
+    bottom: 16,
+    left: 16,
+    right: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#dbeafe",
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: "#93c5fd",
+    zIndex: 10,
+  },
+  selectionText: {
+    color: "#1e40af",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  clearText: {
+    color: "#dc2626",
+    fontWeight: "600",
+    fontSize: 14,
+  },
+  // No pagination on mobile
 });
