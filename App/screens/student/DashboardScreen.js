@@ -15,6 +15,7 @@ import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ProgressCircle from "../../components/ProgressCircle";
 import TopNav from "../../components/TopNav";
+import StudentBottomNav from "../../components/StudentBottomNav";
 
 const { width } = Dimensions.get("window");
 
@@ -167,7 +168,8 @@ export default function DashboardScreen() {
       {/* Dashboard Content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}>
+        contentContainerStyle={styles.scrollContent}
+      >
         {/* Progress Section */}
         <View style={styles.progressSection}>
           <View style={styles.progressCard}>
@@ -216,7 +218,8 @@ export default function DashboardScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalScroll}
-            contentContainerStyle={styles.horizontalScrollContent}>
+            contentContainerStyle={styles.horizontalScrollContent}
+          >
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
@@ -227,7 +230,8 @@ export default function DashboardScreen() {
                 <Text
                   style={styles.courseTitle}
                   numberOfLines={1}
-                  ellipsizeMode="tail">
+                  ellipsizeMode="tail"
+                >
                   {course.title}
                 </Text>
                 <Text style={styles.courseInstructor}>{course.instructor}</Text>
@@ -271,7 +275,8 @@ export default function DashboardScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalScroll}
-            contentContainerStyle={styles.horizontalScrollContent}>
+            contentContainerStyle={styles.horizontalScrollContent}
+          >
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
@@ -282,7 +287,8 @@ export default function DashboardScreen() {
                 <Text
                   style={styles.courseTitle}
                   numberOfLines={1}
-                  ellipsizeMode="tail">
+                  ellipsizeMode="tail"
+                >
                   {course.title}
                 </Text>
                 <Text style={styles.courseInstructor}>{course.instructor}</Text>
@@ -378,7 +384,8 @@ export default function DashboardScreen() {
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.horizontalScroll}
-            contentContainerStyle={styles.horizontalScrollContent}>
+            contentContainerStyle={styles.horizontalScrollContent}
+          >
             {activeCourses.map((course, index) => (
               <View key={index} style={styles.courseCard}>
                 <Image
@@ -390,14 +397,16 @@ export default function DashboardScreen() {
                   style={[
                     styles.courseInstructor,
                     { marginBottom: 2, fontSize: 12 },
-                  ]}>
+                  ]}
+                >
                   {course.instructor}
                 </Text>
 
                 <Text
                   style={styles.courseTitle}
                   numberOfLines={1}
-                  ellipsizeMode="tail">
+                  ellipsizeMode="tail"
+                >
                   {course.title}
                 </Text>
 
@@ -409,7 +418,8 @@ export default function DashboardScreen() {
                       fontSize: 12,
                       justifyContent: "space-evenly",
                     },
-                  ]}>
+                  ]}
+                >
                   <Ionicons name="star" size={13} color={"#E7670C"} /> - 4.8 -{" "}
                   5hr 10m - Intermediate
                 </Text>
@@ -420,6 +430,7 @@ export default function DashboardScreen() {
 
         <View style={styles.bottomPadding} />
       </ScrollView>
+      <StudentBottomNav />
     </SafeAreaView>
   );
 }

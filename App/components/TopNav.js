@@ -17,7 +17,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Ionicons, FontAwesome5, MaterialIcons } from "@expo/vector-icons";
 
-export default function InsTopNav({}) {
+export default function TopNav({}) {
   const navigation = useNavigation();
   const route = useRoute();
   const { width, height } = useWindowDimensions();
@@ -120,7 +120,8 @@ export default function InsTopNav({}) {
           styles.searchContainer,
           isMobile && styles.searchContainerMobile,
           showSearchBar && styles.searchContainerExpanded,
-        ]}>
+        ]}
+      >
         <TextInput
           style={styles.searchInput}
           placeholder="Search..."
@@ -130,13 +131,15 @@ export default function InsTopNav({}) {
         />
         <TouchableOpacity
           style={styles.searchButton}
-          onPress={() => console.log("Search:", searchText)}>
+          onPress={() => console.log("Search:", searchText)}
+        >
           <Ionicons name="search" size={18} color="#fff" />
         </TouchableOpacity>
         {isMobile && showSearchBar && (
           <TouchableOpacity
             style={styles.searchCloseButton}
-            onPress={() => setShowSearchBar(false)}>
+            onPress={() => setShowSearchBar(false)}
+          >
             <Ionicons name="close" size={20} color="#666" />
           </TouchableOpacity>
         )}
@@ -153,14 +156,17 @@ export default function InsTopNav({}) {
             isMobile && styles.topHeaderMobile,
             isTablet && styles.topHeaderTablet,
             isLargeTablet && styles.topHeaderLargeTablet,
-          ]}>
+          ]}
+        >
           {/* Left Section - Logo & Menu */}
           <View
-            style={[styles.leftSection, isMobile && styles.leftSectionMobile]}>
+            style={[styles.leftSection, isMobile && styles.leftSectionMobile]}
+          >
             {isMobile && (
               <TouchableOpacity
                 style={styles.menuButton}
-                onPress={() => setShowMobileMenu(!showMobileMenu)}>
+                onPress={() => setShowMobileMenu(!showMobileMenu)}
+              >
                 <Ionicons
                   name={showMobileMenu ? "close" : "menu"}
                   size={24}
@@ -189,7 +195,8 @@ export default function InsTopNav({}) {
                   styles.navContainer,
                   isTablet && styles.navContainerTablet,
                   isLargeTablet && styles.navContainerLargeTablet,
-                ]}>
+                ]}
+              >
                 {navItems.map((item) => (
                   <TouchableOpacity
                     key={item.name}
@@ -201,14 +208,16 @@ export default function InsTopNav({}) {
                     ]}
                     onPress={() =>
                       handleTabPress(item.tabName || item.name, item.screen)
-                    }>
+                    }
+                  >
                     <Text
                       style={[
                         styles.navText,
                         activeNav === (item.tabName || item.name) &&
                           styles.activeNavText,
                         isTablet && styles.navTextTablet,
-                      ]}>
+                      ]}
+                    >
                       {item.name}
                     </Text>
                     {activeNav === (item.tabName || item.name) && (
@@ -224,7 +233,8 @@ export default function InsTopNav({}) {
                   style={[
                     styles.searchWrapper,
                     isTablet && styles.searchWrapperTablet,
-                  ]}>
+                  ]}
+                >
                   {renderSearchBar()}
                 </View>
               )}
@@ -236,7 +246,8 @@ export default function InsTopNav({}) {
                 <>
                   <TouchableOpacity
                     style={styles.mobileSearchButton}
-                    onPress={toggleSearchBar}>
+                    onPress={toggleSearchBar}
+                  >
                     <Ionicons name="search-outline" size={20} color="#333" />
                   </TouchableOpacity>
 
@@ -256,7 +267,8 @@ export default function InsTopNav({}) {
           {/* Desktop Right Icons */}
           {!isMobile && (
             <View
-              style={[styles.rightIcons, isTablet && styles.rightIconsTablet]}>
+              style={[styles.rightIcons, isTablet && styles.rightIconsTablet]}
+            >
               <TouchableOpacity style={styles.notificationBtn}>
                 <Ionicons name="notifications-outline" size={22} color="#333" />
                 <View style={styles.notificationDot} />
@@ -264,7 +276,8 @@ export default function InsTopNav({}) {
 
               <TouchableOpacity
                 style={styles.profileContainer}
-                onPress={() => setShowProfileDropdown(!showProfileDropdown)}>
+                onPress={() => setShowProfileDropdown(!showProfileDropdown)}
+              >
                 <View style={styles.profileImage}>
                   <Text style={styles.profileInitial}>J</Text>
                 </View>
@@ -281,7 +294,8 @@ export default function InsTopNav({}) {
           {isMobile && !showSearchBar && (
             <TouchableOpacity
               style={styles.profileContainerMobile}
-              onPress={() => setShowProfileDropdown(!showProfileDropdown)}>
+              onPress={() => setShowProfileDropdown(!showProfileDropdown)}
+            >
               <View style={styles.profileImageMobile}>
                 <Text style={styles.profileInitial}>J</Text>
               </View>
@@ -301,7 +315,8 @@ export default function InsTopNav({}) {
           <View style={styles.mobileMenu}>
             <ScrollView
               style={styles.mobileMenuScroll}
-              showsVerticalScrollIndicator={false}>
+              showsVerticalScrollIndicator={false}
+            >
               <View style={styles.mobileMenuHeader}>
                 <Text style={styles.mobileMenuTitle}>Navigation</Text>
               </View>
@@ -316,13 +331,15 @@ export default function InsTopNav({}) {
                   ]}
                   onPress={() =>
                     handleTabPress(item.tabName || item.name, item.screen)
-                  }>
+                  }
+                >
                   <Text
                     style={[
                       styles.mobileMenuText,
                       activeNav === (item.tabName || item.name) &&
                         styles.mobileMenuTextActive,
-                    ]}>
+                    ]}
+                  >
                     {item.name}
                   </Text>
                   {activeNav === (item.tabName || item.name) && (
@@ -348,7 +365,8 @@ export default function InsTopNav({}) {
                   onPress={() => {
                     setShowMobileMenu(false);
                     item.action();
-                  }}>
+                  }}
+                >
                   <Ionicons name={item.icon} size={20} color="#666" />
                   <Text style={styles.mobileMenuText}>{item.label}</Text>
                 </TouchableOpacity>
@@ -363,23 +381,27 @@ export default function InsTopNav({}) {
         visible={showProfileDropdown}
         transparent={true}
         animationType="fade"
-        onRequestClose={() => setShowProfileDropdown(false)}>
+        onRequestClose={() => setShowProfileDropdown(false)}
+      >
         <TouchableOpacity
           style={styles.dropdownOverlay}
           activeOpacity={1}
-          onPress={() => setShowProfileDropdown(false)}>
+          onPress={() => setShowProfileDropdown(false)}
+        >
           <View
             style={[
               styles.dropdownContainer,
               isMobile && styles.dropdownContainerMobile,
               isTablet && styles.dropdownContainerTablet,
               isLargeTablet && styles.dropdownContainerLargeTablet,
-            ]}>
+            ]}
+          >
             {profileDropdownItems.map((item) => (
               <TouchableOpacity
                 key={item.id}
                 style={styles.dropdownItem}
-                onPress={() => handleProfileAction(item.action)}>
+                onPress={() => handleProfileAction(item.action)}
+              >
                 <Ionicons name={item.icon} size={20} color="#666" />
                 <Text style={styles.dropdownText}>{item.label}</Text>
               </TouchableOpacity>
