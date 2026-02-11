@@ -77,7 +77,7 @@ export default function LoginScreen() {
   };
 
   const handleSignIn = async () => {
-    navigation.navigate("DashboardScreen");
+    navigation.navigate("InsDashboard");
     return;
 
     if (!validateForm()) {
