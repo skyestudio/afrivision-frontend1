@@ -44,7 +44,7 @@ export default function StudentBottomNav({}) {
         <Ionicons
           name={active ? "home" : "home-outline"}
           size={22}
-          color={active ? "#4A90E2" : "#666"}
+          color={active ? "#ff7a00" : "#666"}
         />
       ),
     },
@@ -55,7 +55,7 @@ export default function StudentBottomNav({}) {
         <Ionicons
           name={active ? "library" : "library-outline"}
           size={22}
-          color={active ? "#4A90E2" : "#666"}
+          color={active ? "#ff7a00" : "#666"}
         />
       ),
     },
@@ -66,7 +66,7 @@ export default function StudentBottomNav({}) {
         <Ionicons
           name={active ? "compass" : "compass-outline"}
           size={22}
-          color={active ? "#4A90E2" : "#666"}
+          color={active ? "#ff7a00" : "#666"}
         />
       ),
     },
@@ -168,8 +168,8 @@ const styles = StyleSheet.create({
     position: "relative",
   },
   activeTabButton: {
-    backgroundColor: "#f0f8ff",
-    borderRadius: 8,
+    backgroundColor: "#ff7a0020",
+    borderRadius: 7,
   },
   iconContainer: {
     position: "relative",
@@ -183,7 +183,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   activeTabText: {
-    color: "#4A90E2",
+    color: "#ff7a00",
     fontWeight: "600",
   },
   profileTabText: {
@@ -193,7 +193,7 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 16,
-    backgroundColor: "#4A90E2",
+    backgroundColor: "#ff7a00",
     alignItems: "center",
     justifyContent: "center",
   },

@@ -27,38 +27,55 @@ export default function LoadingScreen({ navigation }) {
 
   const checkUserStatus = async () => {
     try {
-      // Get user data from AsyncStorage
+      // Small delay for better UX
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+
+      // Step 1: Check if onboarding is completed
+      const onboardingData = await AsyncStorage.getItem("onboardingData");
+      const isOnboardingCompleted = onboardingData !== null;
+
+      console.log("Onboarding completed:", isOnboardingCompleted);
+
+      // Step 2: If onboarding is not completed, go to onboarding
+      if (!isOnboardingCompleted) {
+        console.log("Onboarding not completed, navigating to OnboardingScreen");
+        navigation.replace("OnboardingScreen");
+        return;
+      }
+
+      // Step 3: Onboarding is completed, check for user session
       const token = await AsyncStorage.getItem("userToken");
       const userRole = await AsyncStorage.getItem("userRole");
       const userDataString = await AsyncStorage.getItem("userData");
       const userData = userDataString ? JSON.parse(userDataString) : null;
 
-      // Small delay for better UX
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-
+      // Step 4: Check if user is logged in (has token and user data)
       if (token && userRole && userData) {
         // User is logged in, navigate based on role
         console.log("User logged in with role:", userRole);
 
-        if (userRole === "student" || userRole === "Student") {
-          navigation.replace("StudentStack");
-        } else if (
-          userRole === "instructor" ||
-          userRole === "staff" ||
-          userRole === "teacher" ||
-          userRole === "Instructor"
-        ) {
-          navigation.replace("InstructorStack");
+        // Normalize role to lowercase for consistent comparison
+        const normalizedRole = userRole.toLowerCase();
+
+        if (normalizedRole === "student") {
+          console.log("Navigating to DashboardScreen");
+          navigation.replace("DashboardScreen");
+        } else if (normalizedRole === "instructor") {
+          console.log("Navigating to InsDashboard");
+          navigation.replace("InsDashboard");
         } else {
-          navigation.replace("StudentStack");
+          // Fallback - if role is neither student nor instructor
+          console.log("Unknown role, defaulting to DashboardScreen");
+          navigation.replace("DashboardScreen");
         }
       } else {
-        // No valid session found, go to onboarding
-        console.log("No valid session, navigating to onboarding");
-        navigation.replace("OnboardingScreen");
+        // Step 5: Onboarding completed but no user session, go to login
+        console.log("No valid session, navigating to LoginScreen");
+        navigation.replace("LoginScreen");
       }
     } catch (error) {
       console.error("Error checking user status:", error);
+      // In case of error, go to onboarding as safe fallback
       navigation.replace("OnboardingScreen");
     }
   };
@@ -85,7 +102,6 @@ export default function LoadingScreen({ navigation }) {
     </View>
   );
 }
-
 
 // DESKTOP STYLES (≥ 1024px)
 const desktopStyles = StyleSheet.create({

@@ -28,8 +28,8 @@ export default function LoginScreen() {
       : desktopStyles;
 
   const [formData, setFormData] = useState({
-    email: "revel@unigate.com.ng",
-    password: "123456789",
+    email: "user@example.com",
+    password: "string",
   });
 
   const [loading, setLoading] = useState(false);
@@ -77,9 +77,6 @@ export default function LoginScreen() {
   };
 
   const handleSignIn = async () => {
-    navigation.navigate("InsDashboard");
-    return;
-
     if (!validateForm()) {
       Alert.alert("Validation Error", "Please fill in all fields correctly");
       return;
@@ -89,7 +86,7 @@ export default function LoginScreen() {
     try {
       // 1. Login to get token
       const loginResponse = await fetch(
-        "https://afrivision-backend.onrender.com/v1/auth/login",
+        "https://afrivision-backend.onrender.com/api/v1/auth/login",
         {
           method: "POST",
           headers: {
@@ -120,7 +117,7 @@ export default function LoginScreen() {
 
       // 2. Fetch user profile to get role
       const profileResponse = await fetch(
-        "https://afrivision-backend.onrender.com/api/users/me",
+        "https://afrivision-backend.onrender.com/api/v1/users/me",
         {
           method: "GET",
           headers: {
@@ -153,11 +150,7 @@ export default function LoginScreen() {
       // 3. Navigate based on role
       if (userRole === "student") {
         navigation.navigate("StudentStack");
-      } else if (
-        userRole === "instructor" ||
-        userRole === "staff" ||
-        userRole === "teacher"
-      ) {
+      } else if (userRole === "instructor" || userRole === "staff") {
         navigation.navigate("InstructorStack");
       } else {
         navigation.navigate("StudentStack"); // Default to student
@@ -176,6 +169,13 @@ export default function LoginScreen() {
 
   const handleSignUp = () => {
     navigation.navigate("SignupScreen");
+  };
+
+  const handleMockLogin = () => {
+    // Mock login for testing
+    AsyncStorage.setItem("userToken", "mock-token");
+    AsyncStorage.setItem("userRole", "student");
+    navigation.navigate("StudentStack");
   };
 
   // Get responsive layout
@@ -302,6 +302,30 @@ export default function LoginScreen() {
                   <ActivityIndicator color="#fff" size="small" />
                 ) : (
                   <Text style={styles.signInText}>Sign in</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.signInButton, loading && styles.disabledButton]}
+                onPress={() => navigation.navigate("DashboardScreen")}
+                // disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.signInText}>Sign in as student</Text>
+                )}
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.signInButton, loading && styles.disabledButton]}
+                onPress={() => navigation.navigate("InsDashboard")}
+                // disabled={loading}
+              >
+                {loading ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={styles.signInText}>Sign in as instructor</Text>
                 )}
               </TouchableOpacity>
 
@@ -433,8 +457,6 @@ export default function LoginScreen() {
                     </TouchableOpacity>
                   </View>
 
-                  {/* Sign In Button 
-               
                   <TouchableOpacity
                     style={[
                       styles.signInButton,
@@ -449,8 +471,6 @@ export default function LoginScreen() {
                       <Text style={styles.signInText}>Sign in</Text>
                     )}
                   </TouchableOpacity>
-                  
-                  */}
 
                   <TouchableOpacity
                     style={[styles.signInButton]}
@@ -883,7 +903,10 @@ const tabletStyles = StyleSheet.create({
 const mobileStyles = StyleSheet.create({
   mainContainer: { flex: 1, backgroundColor: "#fff" },
   safeArea: { flex: 1 },
-  scrollView: { flex: 1 },
+  scrollView: {
+    // flex: 1,
+    height: 1,
+  },
   scrollContent: {
     flexGrow: 1,
     paddingBottom: 30,

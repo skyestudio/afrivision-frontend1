@@ -14,9 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import { api } from "../utils/api";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { BASE_API } from "@env";
 
 export default function SignupScreen() {
   const navigation = useNavigation();
@@ -33,25 +31,16 @@ export default function SignupScreen() {
   const [formData, setFormData] = useState({
     firstname: "",
     lastname: "",
-    mobile: "",
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student",
-    gender: "",
-    dob: new Date(),
-    country: "",
-    city: "",
-    occupation: "",
   });
 
   const [loading, setLoading] = useState(false);
-  const [showDatePicker, setShowDatePicker] = useState(false);
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear error for this field
     if (errors[field]) {
       setErrors((prev) => ({ ...prev, [field]: "" }));
     }
@@ -60,31 +49,32 @@ export default function SignupScreen() {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.firstname.trim())
+    if (!formData.firstname?.trim()) {
       newErrors.firstname = "First name is required";
-    if (!formData.lastname.trim()) newErrors.lastname = "Last name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    else if (!/\S+@\S+\.\S+/.test(formData.email))
-      newErrors.email = "Email is invalid";
+    }
 
-    if (!formData.password) newErrors.password = "Password is required";
-    else if (formData.password.length < 6)
+    if (!formData.lastname?.trim()) {
+      newErrors.lastname = "Last name is required";
+    }
+
+    if (!formData.email?.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Email is invalid";
+    }
+
+    if (!formData.password) {
+      newErrors.password = "Password is required";
+    } else if (formData.password.length < 6) {
       newErrors.password = "Password must be at least 6 characters";
+    }
 
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = "Passwords do not match";
     }
 
-    if (!formData.mobile.trim()) newErrors.mobile = "Mobile number is required";
-    if (!formData.gender) newErrors.gender = "Gender is required";
-    if (!formData.role) newErrors.role = "Please select a role";
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const formatDate = (date) => {
-    return date.toISOString().split("T")[0];
   };
 
   const handleSignUp = async () => {
@@ -98,62 +88,63 @@ export default function SignupScreen() {
 
     setLoading(true);
     try {
-      // Prepare data for API
+      // Only send the 4 required fields
       const signupData = {
-        firstname: formData.firstname,
-        lastname: formData.lastname,
-        email: formData.email,
+        firstname: formData.firstname.trim(),
+        lastname: formData.lastname.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
-        role: formData.role,
-        phoneNumber: formData.mobile,
-        gender: formData.gender,
-        dob: formatDate(formData.dob),
-        country: formData.country,
-        city: formData.city,
-        bio: formData.occupation,
-        avatarUrl: "", // You can add image upload later
       };
 
-      // Call signup API
-      const response = await api.post("/auth/register", signupData);
+      console.log("Sending data:", signupData);
+      console.log("API URL:", `${BASE_API}auth/register`);
 
-      if (response.success) {
+      const response = await fetch(`${BASE_API}auth/register`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+        body: JSON.stringify(signupData),
+      });
+
+      const result = await response.json();
+      console.log("API Response:", result);
+
+      if (response.ok || response.status === 201) {
         Alert.alert(
           "Success!",
           "Account created successfully. Please login to continue.",
           [
             {
               text: "OK",
-              onPress: () => navigation.navigate("LoginScreen"),
+              onPress: () => navigation.navigate("Login"),
             },
           ],
         );
+
+        // Clear form
+        setFormData({
+          firstname: "",
+          lastname: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
       } else {
-        Alert.alert(
-          "Registration Failed",
-          response.message || "Something went wrong",
-        );
+        const errorMessage =
+          result.message || result.error || "Registration failed";
+        Alert.alert("Registration Failed", errorMessage);
       }
     } catch (error) {
       console.error("Signup error:", error);
       Alert.alert(
-        "Registration Error",
-        error.message || "Failed to create account. Please try again.",
+        "Connection Error",
+        "Unable to connect to server. Please check your internet connection and try again.",
       );
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleDateChange = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      handleInputChange("dob", selectedDate);
-    }
-  };
-
-  const onDatePress = () => {
-    setShowDatePicker(true);
   };
 
   // Get responsive layout
@@ -211,7 +202,7 @@ export default function SignupScreen() {
               </View>
             )}
 
-            {/* Right Side - Form */}
+            {/* Right Side - Simple Form with only required fields */}
             <View style={styles.rightSide}>
               {/* Mobile Header */}
               {isMobile && (
@@ -235,74 +226,51 @@ export default function SignupScreen() {
                   {isMobile ? "Let's get started" : "Create Account"}
                 </Text>
 
-                {/* Name Fields - Responsive Layout */}
-                <View style={isMobile ? styles.nameColumn : styles.nameRow}>
-                  <View
+                {/* First Name */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>
+                    First Name <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
                     style={[
-                      styles.inputGroup,
-                      isMobile ? styles.fullWidth : styles.halfWidth,
+                      styles.input,
+                      errors.firstname && styles.inputError,
                     ]}
-                  >
-                    <Text style={styles.label}>
-                      First Name{" "}
-                      {!formData.firstname && (
-                        <Text style={styles.required}>*</Text>
-                      )}
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        errors.firstname && styles.inputError,
-                      ]}
-                      placeholder="Enter first name"
-                      placeholderTextColor="#999"
-                      value={formData.firstname}
-                      onChangeText={(text) =>
-                        handleInputChange("firstname", text)
-                      }
-                      editable={!loading}
-                    />
-                    {errors.firstname && (
-                      <Text style={styles.errorText}>{errors.firstname}</Text>
-                    )}
-                  </View>
+                    placeholder="Enter your first name"
+                    placeholderTextColor="#999"
+                    value={formData.firstname}
+                    onChangeText={(text) =>
+                      handleInputChange("firstname", text)
+                    }
+                    editable={!loading}
+                  />
+                  {errors.firstname && (
+                    <Text style={styles.errorText}>{errors.firstname}</Text>
+                  )}
+                </View>
 
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      isMobile ? styles.fullWidth : styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.label}>
-                      Last Name{" "}
-                      {!formData.lastname && (
-                        <Text style={styles.required}>*</Text>
-                      )}
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        errors.lastname && styles.inputError,
-                      ]}
-                      placeholder="Enter last name"
-                      placeholderTextColor="#999"
-                      value={formData.lastname}
-                      onChangeText={(text) =>
-                        handleInputChange("lastname", text)
-                      }
-                      editable={!loading}
-                    />
-                    {errors.lastname && (
-                      <Text style={styles.errorText}>{errors.lastname}</Text>
-                    )}
-                  </View>
+                {/* Last Name */}
+                <View style={styles.inputGroup}>
+                  <Text style={styles.label}>
+                    Last Name <Text style={styles.required}>*</Text>
+                  </Text>
+                  <TextInput
+                    style={[styles.input, errors.lastname && styles.inputError]}
+                    placeholder="Enter your last name"
+                    placeholderTextColor="#999"
+                    value={formData.lastname}
+                    onChangeText={(text) => handleInputChange("lastname", text)}
+                    editable={!loading}
+                  />
+                  {errors.lastname && (
+                    <Text style={styles.errorText}>{errors.lastname}</Text>
+                  )}
                 </View>
 
                 {/* Email */}
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>
-                    Email Address{" "}
-                    {!formData.email && <Text style={styles.required}>*</Text>}
+                    Email Address <Text style={styles.required}>*</Text>
                   </Text>
                   <TextInput
                     style={[styles.input, errors.email && styles.inputError]}
@@ -310,8 +278,11 @@ export default function SignupScreen() {
                     placeholderTextColor="#999"
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    autoCorrect={false}
                     value={formData.email}
-                    onChangeText={(text) => handleInputChange("email", text)}
+                    onChangeText={(text) =>
+                      handleInputChange("email", text.trim())
+                    }
                     editable={!loading}
                   />
                   {errors.email && (
@@ -319,247 +290,48 @@ export default function SignupScreen() {
                   )}
                 </View>
 
-                {/* Mobile Number */}
+                {/* Password */}
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>
-                    Mobile Number{" "}
-                    {!formData.mobile && <Text style={styles.required}>*</Text>}
+                    Password <Text style={styles.required}>*</Text>
                   </Text>
                   <TextInput
-                    style={[styles.input, errors.mobile && styles.inputError]}
-                    placeholder="Enter your phone number"
+                    style={[styles.input, errors.password && styles.inputError]}
+                    placeholder="Create a password (min. 6 characters)"
                     placeholderTextColor="#999"
-                    keyboardType="phone-pad"
-                    value={formData.mobile}
-                    onChangeText={(text) => handleInputChange("mobile", text)}
+                    secureTextEntry
+                    value={formData.password}
+                    onChangeText={(text) => handleInputChange("password", text)}
                     editable={!loading}
                   />
-                  {errors.mobile && (
-                    <Text style={styles.errorText}>{errors.mobile}</Text>
+                  {errors.password && (
+                    <Text style={styles.errorText}>{errors.password}</Text>
                   )}
                 </View>
 
-                {/* Passwords - Responsive Layout */}
-                <View
-                  style={isMobile ? styles.passwordColumn : styles.passwordRow}
-                >
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      isMobile ? styles.fullWidth : styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.label}>
-                      Password{" "}
-                      {!formData.password && (
-                        <Text style={styles.required}>*</Text>
-                      )}
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        errors.password && styles.inputError,
-                      ]}
-                      placeholder="Create a password"
-                      placeholderTextColor="#999"
-                      secureTextEntry
-                      value={formData.password}
-                      onChangeText={(text) =>
-                        handleInputChange("password", text)
-                      }
-                      editable={!loading}
-                    />
-                    {errors.password && (
-                      <Text style={styles.errorText}>{errors.password}</Text>
-                    )}
-                  </View>
-
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      isMobile ? styles.fullWidth : styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.label}>
-                      Confirm Password{" "}
-                      {!formData.confirmPassword && (
-                        <Text style={styles.required}>*</Text>
-                      )}
-                    </Text>
-                    <TextInput
-                      style={[
-                        styles.input,
-                        errors.confirmPassword && styles.inputError,
-                      ]}
-                      placeholder="Confirm your password"
-                      placeholderTextColor="#999"
-                      secureTextEntry
-                      value={formData.confirmPassword}
-                      onChangeText={(text) =>
-                        handleInputChange("confirmPassword", text)
-                      }
-                      editable={!loading}
-                    />
-                    {errors.confirmPassword && (
-                      <Text style={styles.errorText}>
-                        {errors.confirmPassword}
-                      </Text>
-                    )}
-                  </View>
-                </View>
-
-                {/* Gender Selection */}
+                {/* Confirm Password */}
                 <View style={styles.inputGroup}>
                   <Text style={styles.label}>
-                    Gender{" "}
-                    {!formData.gender && <Text style={styles.required}>*</Text>}
+                    Confirm Password <Text style={styles.required}>*</Text>
                   </Text>
-                  <View style={styles.radioContainer}>
-                    {["Male", "Female", "Other"].map((gender) => (
-                      <TouchableOpacity
-                        key={gender}
-                        style={[
-                          styles.radioButton,
-                          formData.gender === gender.toLowerCase() &&
-                            styles.radioButtonSelected,
-                        ]}
-                        onPress={() =>
-                          handleInputChange("gender", gender.toLowerCase())
-                        }
-                        disabled={loading}
-                      >
-                        <Text
-                          style={[
-                            styles.radioText,
-                            formData.gender === gender.toLowerCase() &&
-                              styles.radioTextSelected,
-                          ]}
-                        >
-                          {gender}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                  {errors.gender && (
-                    <Text style={styles.errorText}>{errors.gender}</Text>
-                  )}
-                </View>
-
-                {/* Date of Birth */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Date of Birth</Text>
-                  <TouchableOpacity onPress={onDatePress} disabled={loading}>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="DD/MM/YYYY"
-                      placeholderTextColor="#999"
-                      value={formatDate(formData.dob)}
-                      editable={false}
-                      pointerEvents="none"
-                    />
-                  </TouchableOpacity>
-                  {showDatePicker && (
-                    <DateTimePicker
-                      value={formData.dob}
-                      mode="date"
-                      display={isMobile ? "spinner" : "default"}
-                      onChange={handleDateChange}
-                      maximumDate={new Date()}
-                    />
-                  )}
-                </View>
-
-                {/* Location - Responsive Layout */}
-                <View
-                  style={isMobile ? styles.locationColumn : styles.locationRow}
-                >
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      isMobile ? styles.fullWidth : styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.label}>Country</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter your country"
-                      placeholderTextColor="#999"
-                      value={formData.country}
-                      onChangeText={(text) =>
-                        handleInputChange("country", text)
-                      }
-                      editable={!loading}
-                    />
-                  </View>
-
-                  <View
-                    style={[
-                      styles.inputGroup,
-                      isMobile ? styles.fullWidth : styles.halfWidth,
-                    ]}
-                  >
-                    <Text style={styles.label}>City</Text>
-                    <TextInput
-                      style={styles.input}
-                      placeholder="Enter your city"
-                      placeholderTextColor="#999"
-                      value={formData.city}
-                      onChangeText={(text) => handleInputChange("city", text)}
-                      editable={!loading}
-                    />
-                  </View>
-                </View>
-
-                {/* Occupation */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>Occupation</Text>
                   <TextInput
-                    style={styles.input}
-                    placeholder="Enter your occupation"
+                    style={[
+                      styles.input,
+                      errors.confirmPassword && styles.inputError,
+                    ]}
+                    placeholder="Confirm your password"
                     placeholderTextColor="#999"
-                    value={formData.occupation}
+                    secureTextEntry
+                    value={formData.confirmPassword}
                     onChangeText={(text) =>
-                      handleInputChange("occupation", text)
+                      handleInputChange("confirmPassword", text)
                     }
                     editable={!loading}
                   />
-                </View>
-
-                {/* User Type Selection */}
-                <View style={styles.inputGroup}>
-                  <Text style={styles.label}>
-                    Register as{" "}
-                    {!formData.role && <Text style={styles.required}>*</Text>}
-                  </Text>
-                  <View style={styles.roleContainer}>
-                    {["student", "instructor"].map((type) => (
-                      <TouchableOpacity
-                        key={type}
-                        style={[
-                          styles.roleButton,
-                          formData.role === type && styles.roleButtonSelected,
-                        ]}
-                        onPress={() => handleInputChange("role", type)}
-                        disabled={loading}
-                      >
-                        <Text
-                          style={[
-                            styles.roleText,
-                            formData.role === type && styles.roleTextSelected,
-                          ]}
-                        >
-                          {type.charAt(0).toUpperCase() + type.slice(1)}
-                        </Text>
-                        <Text style={styles.roleDescription}>
-                          {type === "student"
-                            ? "Learn from experts"
-                            : "Teach and earn"}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
-                  {errors.role && (
-                    <Text style={styles.errorText}>{errors.role}</Text>
+                  {errors.confirmPassword && (
+                    <Text style={styles.errorText}>
+                      {errors.confirmPassword}
+                    </Text>
                   )}
                 </View>
 
@@ -685,7 +457,8 @@ const desktopStyles = StyleSheet.create({
     flex: 1,
   },
   formScroll: {
-    flex: 1,
+    // flex: 1,
+    height: 1,
   },
   formScrollContent: {
     paddingBottom: 40,

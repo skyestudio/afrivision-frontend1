@@ -79,16 +79,11 @@ export default function TopNav({}) {
 
   // Navigation items
   const navItems = [
-    { name: "Dashboard", screen: "InsDashboard" },
+    { name: "Dashboard", screen: "DashboardScreen" },
     {
       name: "My Courses",
-      screen: "IncMyCoursesScreen",
-      tabName: "IncMyCoursesScreen",
-    },
-    {
-      name: "My Students",
-      screen: "IncMyStudentsScreen",
-      tabName: "IncMyStudentsScreen",
+      screen: "MyCourses",
+      tabName: "MyCourses",
     },
     { name: "Assessment", screen: "Assessment" },
   ];

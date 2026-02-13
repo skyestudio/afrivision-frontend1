@@ -12,6 +12,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width } = Dimensions.get("window");
 
@@ -23,6 +24,20 @@ export default function OnboardingScreen() {
   const [step3Selection, setStep3Selection] = useState(null);
   const [step4Selection, setStep4Selection] = useState(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    // Check if onboarding data already exists
+    AsyncStorage.getItem("onboardingData")
+      .then((data) => {
+        if (data) {
+          // If data exists, skip onboarding
+          navigation.navigate("LoginScreen");
+        }
+      })
+      .catch((error) => {
+        console.error("Error checking onboarding data:", error);
+      });
+  }, []);
 
   // Step 1: What brings you here
   const step1Options = [
@@ -206,17 +221,32 @@ export default function OnboardingScreen() {
     setStep4Selection(optionId);
   };
 
-  const handleFinish = () => {
+  const handleFinish = async () => {
     const userData = {
       purpose: step1Selections,
       interests: step2Selections,
       role: step3Selection,
       education: step4Selection,
     };
+
     console.log("User onboarding data:", userData);
-    // Navigate to main app
-    // alert("Onboarding completed! Data saved.");
-    navigation.navigate("LoginScreen");
+
+    try {
+      // Save onboarding data
+      await AsyncStorage.setItem("onboardingData", JSON.stringify(userData));
+
+      // Also save the user role separately for easy access
+      if (step3Selection) {
+        await AsyncStorage.setItem("userRole", step3Selection.toLowerCase());
+      }
+
+      console.log("Onboarding data saved to AsyncStorage");
+
+      // Navigate to login
+      navigation.navigate("LoginScreen");
+    } catch (error) {
+      console.error("Error saving onboarding data:", error);
+    }
   };
 
   const handleSkip = () => {
@@ -234,7 +264,8 @@ export default function OnboardingScreen() {
         return (
           <ScrollView
             contentContainerStyle={styles.stepContent}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.optionsContainer}>
               {step1Options.map((option) => {
                 const isSelected = step1Selections.includes(option.id);
@@ -246,7 +277,8 @@ export default function OnboardingScreen() {
                       isSelected && styles.optionButtonSelected,
                     ]}
                     onPress={() => handleStep1Select(option.id)}
-                    disabled={!isSelected && step1Selections.length >= 2}>
+                    disabled={!isSelected && step1Selections.length >= 2}
+                  >
                     <View style={styles.optionContent}>
                       <View style={styles.optionIconContainer}>
                         <Ionicons
@@ -259,7 +291,8 @@ export default function OnboardingScreen() {
                         style={[
                           styles.optionButtonText,
                           isSelected && styles.optionButtonTextSelected,
-                        ]}>
+                        ]}
+                      >
                         {option.title}
                       </Text>
                       {/**  <Ionicons
@@ -286,7 +319,8 @@ export default function OnboardingScreen() {
         return (
           <ScrollView
             contentContainerStyle={styles.stepContent}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.optionsContainer}>
               {step2Categories.map((category) => (
                 <View key={category.id} style={styles.categoryContainer}>
@@ -302,7 +336,8 @@ export default function OnboardingScreen() {
                             isSelected && styles.interestOptionSelected,
                           ]}
                           onPress={() => handleStep2Select(option.id)}
-                          disabled={!isSelected && step2Selections.length >= 5}>
+                          disabled={!isSelected && step2Selections.length >= 5}
+                        >
                           <Ionicons
                             name={option.icon}
                             size={20}
@@ -312,7 +347,8 @@ export default function OnboardingScreen() {
                             style={[
                               styles.interestOptionText,
                               isSelected && styles.interestOptionTextSelected,
-                            ]}>
+                            ]}
+                          >
                             {option.title}
                           </Text>
                           {/**   {isSelected && (
@@ -338,7 +374,8 @@ export default function OnboardingScreen() {
         return (
           <ScrollView
             contentContainerStyle={styles.stepContent}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.optionsContainer}>
               <View style={styles.roleOptionContainer}>
                 {step3Options.map((option) => {
@@ -350,7 +387,8 @@ export default function OnboardingScreen() {
                         styles.roleOption,
                         isSelected && styles.roleOptionSelected,
                       ]}
-                      onPress={() => handleStep3Select(option.id)}>
+                      onPress={() => handleStep3Select(option.id)}
+                    >
                       <View style={styles.roleOptionContent}>
                         <View style={styles.roleIconContainer}>
                           <Ionicons
@@ -363,7 +401,8 @@ export default function OnboardingScreen() {
                           style={[
                             styles.roleOptionText,
                             isSelected && styles.roleOptionTextSelected,
-                          ]}>
+                          ]}
+                        >
                           {option.title}
                         </Text>
                         {/**   <Ionicons
@@ -386,7 +425,8 @@ export default function OnboardingScreen() {
         return (
           <ScrollView
             contentContainerStyle={styles.stepContent}
-            showsVerticalScrollIndicator={false}>
+            showsVerticalScrollIndicator={false}
+          >
             <View style={styles.optionsContainer}>
               <View style={styles.optionsContainerPremier}>
                 {step4Options.map((option) => {
@@ -398,13 +438,15 @@ export default function OnboardingScreen() {
                         styles.educationOption,
                         isSelected && styles.educationOptionSelected,
                       ]}
-                      onPress={() => handleStep4Select(option.id)}>
+                      onPress={() => handleStep4Select(option.id)}
+                    >
                       <View style={styles.educationOptionContent}>
                         <Text
                           style={[
                             styles.educationOptionText,
                             isSelected && styles.educationOptionTextSelected,
-                          ]}>
+                          ]}
+                        >
                           {option.title}
                         </Text>
                         <Ionicons
@@ -449,12 +491,14 @@ export default function OnboardingScreen() {
                   style={[
                     styles.progressCircle,
                     currentStep >= index && styles.progressCircleActive,
-                  ]}>
+                  ]}
+                >
                   <Text
                     style={[
                       styles.progressText,
                       currentStep >= index && styles.progressTextActive,
-                    ]}>
+                    ]}
+                  >
                     {index + 1}
                   </Text>
                 </View>
@@ -506,7 +550,8 @@ export default function OnboardingScreen() {
               styles.nextButton,
               currentStep === 3 && styles.finishButton,
             ]}
-            onPress={handleNext}>
+            onPress={handleNext}
+          >
             <Text style={styles.nextButtonText}>
               {currentStep === 3 ? "Finished" : "Next"}
             </Text>

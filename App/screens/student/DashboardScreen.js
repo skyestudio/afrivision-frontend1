@@ -206,7 +206,7 @@ export default function DashboardScreen() {
       <View style={!isMobile && styles.spacer} />
 
       <ScrollView
-        showsVerticalScrollIndicator={false}
+        showsVerticalScrollIndicator={true}
         contentContainerStyle={styles.scrollContent}
       >
         {/* Welcome & Progress Section */}
@@ -1222,6 +1222,7 @@ const mobileStyles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 40,
     paddingTop: 16,
+    height: 1,
   },
   welcomeSection: {
     marginBottom: 24,
