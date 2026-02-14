@@ -473,12 +473,35 @@ export default function LoginScreen() {
                   </TouchableOpacity>
 
                   <TouchableOpacity
-                    style={[styles.signInButton]}
-                    onPress={() => {
-                      navigation.navigate("StudentStack");
-                    }}
+                    style={[
+                      styles.signInButton,
+                      loading && styles.disabledButton,
+                    ]}
+                    onPress={() => navigation.navigate("DashboardScreen")}
+                    // disabled={loading}
                   >
-                    <Text style={styles.signInText}>Sign in</Text>
+                    {loading ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Text style={styles.signInText}>Sign in as student</Text>
+                    )}
+                  </TouchableOpacity>
+
+                  <TouchableOpacity
+                    style={[
+                      styles.signInButton,
+                      loading && styles.disabledButton,
+                    ]}
+                    onPress={() => navigation.navigate("InsDashboard")}
+                    // disabled={loading}
+                  >
+                    {loading ? (
+                      <ActivityIndicator color="#fff" size="small" />
+                    ) : (
+                      <Text style={styles.signInText}>
+                        Sign in as instructor
+                      </Text>
+                    )}
                   </TouchableOpacity>
 
                   {/* Sign Up */}
