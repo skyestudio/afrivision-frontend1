@@ -15,10 +15,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ProgressCircle from "../../components/ProgressCircle";
 import TopNav from "../../components/TopNav";
 import StudentBottomNav from "../../components/StudentBottomNav";
+import { useNavigation } from "@react-navigation/native";
 
 export default function DashboardScreen() {
   const { width } = useWindowDimensions();
   const [searchText, setSearchText] = useState("");
+  const navigation = useNavigation();
 
   const isMobile = width < 768;
   const isTablet = width >= 768 && width < 1024;
@@ -217,7 +219,10 @@ export default function DashboardScreen() {
               <Text style={styles.welcomeSubtitle}>
                 You've completed 3 out of 5 courses this month
               </Text>
-              <TouchableOpacity style={styles.continueButton}>
+              <TouchableOpacity
+                style={styles.continueButton}
+                onPress={() => navigation.navigate("LessonPlayerScreen")}
+              >
                 <Text style={styles.continueButtonText}>Continue Learning</Text>
                 <Ionicons name="arrow-forward" size={16} color="#fff" />
               </TouchableOpacity>
@@ -300,7 +305,10 @@ export default function DashboardScreen() {
                     {course.instructor}
                   </Text>
                   <ProgressBar progress={course.progress} />
-                  <TouchableOpacity style={styles.continueCourseBtn}>
+                  <TouchableOpacity
+                    style={styles.continueCourseBtn}
+                    onPress={() => navigation.navigate("LessonPlayerScreen")}
+                  >
                     <Text style={styles.continueCourseText}>Continue</Text>
                   </TouchableOpacity>
                 </View>
