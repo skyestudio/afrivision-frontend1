@@ -246,6 +246,8 @@ export default function OnboardingScreen() {
       navigation.navigate("LoginScreen");
     } catch (error) {
       console.error("Error saving onboarding data:", error);
+    } finally {
+      navigation.navigate("LoginScreen");
     }
   };
 
